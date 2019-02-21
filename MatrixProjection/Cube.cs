@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace MatrixProjection
 {
     public class Cube : GameObject
-    {        
+    {
         Vector3[] vertices = {
             new Vector3 (0, 0, 0),
             new Vector3 (1, 0, 0),
@@ -37,11 +37,9 @@ namespace MatrixProjection
 		    	0, 1, 6
             };
 
-
-
         public Cube(Vector3 pos, Vector3 size) : base(pos, size)
         {
-            
+
         }
     }
 }

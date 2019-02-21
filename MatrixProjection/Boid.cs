@@ -20,9 +20,7 @@ namespace MatrixProjection
 
         float perceptionRadius = 500;
 
-        private Vector3 prevPos;
-
-        public Color color = Color.White * 0.8f;
+        private Vector3 prevPos;        
 
         Vector3[] points = {
             new Vector3 (0, 0, 1),
@@ -41,7 +39,7 @@ namespace MatrixProjection
 
         public Boid(Vector3 pos, Vector3 size) : base(pos, size)
         {
-            prevPos = pos;
+            prevPos = pos;            
         }
 
         public void MapPoints()
@@ -204,9 +202,9 @@ namespace MatrixProjection
 
                 Vector3 normal = getVertexNormal(v.Position, v1.Position, v2.Position);
                 
-                //v.Normal = normal;
-                //v1.Normal = normal;
-                //v2.Normal = normal;
+                v.Normal = normal;
+                v1.Normal = normal;
+                v2.Normal = normal;
 
                 vertices.Add(v);
                 vertices.Add(v1);
