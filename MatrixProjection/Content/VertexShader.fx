@@ -9,17 +9,26 @@
 
 matrix ViewProjection;
 matrix World;
+float4 Color;
+float3 Normal;
+
+float3 LightPos;
+float LightPower;
+float4 LightColor;
+float4 AmbientLightColor;
 
 struct VertexShaderInput
 {
 	float4 Position : POSITION0;
-	float4 Color : COLOR0;
+    float3 Normal : NORMAL0;
 };
 
 struct VertexShaderOutput
 {
 	float4 Position : SV_POSITION;
 	float4 Color : COLOR0;
+    float3 Position3D : TEXCOORD0;
+    float3 Normal : NORMAL0;
 };
 
 VertexShaderOutput MainVS(in VertexShaderInput input)
@@ -28,14 +37,27 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
     matrix WorldViewProjection = mul(World, ViewProjection);
 	output.Position = mul(input.Position, WorldViewProjection);
-    output.Color = float4(255, 255, 255, 255);
+    output.Normal = normalize(mul(input.Normal, (float3x3)World)); // Remember to cast World to 3x3 to retain only rotation data !!!
+    output.Position3D = mul(input.Position, World);
+    output.Color = Color;
 
 	return output;
 }
 
+float DotProduct(float3 lightPos, float3 pos3D, float3 normal)
+{
+    float3 lightDir = normalize(pos3D - lightPos);
+    return dot(-lightDir, normal);
+}
+
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-	return input.Color;
+    float diffuseLightingFactor = DotProduct(LightPos, input.Position3D, input.Normal);
+    diffuseLightingFactor = saturate(diffuseLightingFactor);
+    diffuseLightingFactor *= LightPower;
+    
+    input.Color = Color*(LightColor + diffuseLightingFactor + AmbientLightColor);
+    return input.Color;
 }
 
 technique BasicColorDrawing
