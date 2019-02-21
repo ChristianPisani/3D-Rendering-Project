@@ -17,6 +17,7 @@ namespace MatrixProjection
         {
             this.divisions = divisions + 1;
             MapVertices();
+            InitializeVertexBuffer();
         }
 
         public List<List<Vector3>> MapPoints()
@@ -60,9 +61,9 @@ namespace MatrixProjection
                     v2.Position = points[x][y+1];
                     v3.Position = points[x + 1][y + 1];
 
-                    //v.Normal = getVertexNormal(v2.Position, v1.Position, v.Position);
-                    //v1.Normal = v.Normal;
-                    //v2.Normal = v.Normal;
+                    v.Normal = getVertexNormal(v2.Position, v1.Position, v.Position);
+                    v1.Normal = v.Normal;
+                    v2.Normal = v.Normal;
 
                     vertices.Add(v2);
                     vertices.Add(v1);
@@ -71,9 +72,9 @@ namespace MatrixProjection
                     v4 = v1;
                     v5 = v2;
 
-                    ///v3.Normal = getVertexNormal(v4.Position, v5.Position, v3.Position);
-                    //v4.Normal = v3.Normal;
-                    //v5.Normal = v3.Normal;
+                    v3.Normal = getVertexNormal(v4.Position, v5.Position, v3.Position);
+                    v4.Normal = v3.Normal;
+                    v5.Normal = v3.Normal;
 
                     vertices.Add(v3);
                     vertices.Add(v4);
@@ -81,7 +82,14 @@ namespace MatrixProjection
 
 
                     //  Backface
-                    /* 
+                    float offset = 0.001f;
+                    v.Position.Y += offset;
+                    v1.Position.Y += offset;
+                    v2.Position.Y += offset;
+                    v3.Position.Y += offset;
+                    v4.Position.Y += offset;
+                    v5.Position.Y += offset;
+
                     v.Normal = getVertexNormal(v.Position, v1.Position, v2.Position);
                     v1.Normal = v.Normal;
                     v2.Normal = v.Normal;                    
@@ -97,7 +105,7 @@ namespace MatrixProjection
                     vertices.Add(v5);
                     vertices.Add(v4);
                     vertices.Add(v3);
-                    */
+                    
                 }
             }
         }
@@ -134,18 +142,30 @@ namespace MatrixProjection
                 var normal = getVertexNormal(v, v1, v2);
 
                 newVertex.Position = v;
-                //newVertex.Normal = normal;
+                newVertex.Normal = normal;
 
                 newVertex1.Position = v1;
-                //newVertex1.Normal = normal;
+                newVertex1.Normal = normal;
 
                 newVertex2.Position = v2;
-                //newVertex2.Normal = normal;
+                newVertex2.Normal = normal;
 
                 vertices[i] = newVertex;
                 vertices[i + 1] = newVertex1;
                 vertices[i + 2] = newVertex2;
             }
+
+            SetVertexData();
+        }
+
+        public override void Draw(GraphicsDevice graphicsDevice, Camera camera, Effect effect)
+        {
+            Vector4 oldColor = effect.Parameters["Color"].GetValueVector4();
+            effect.Parameters["Color"].SetValue(Color.Red.ToVector4());
+
+            base.Draw(graphicsDevice, camera, effect);
+
+            effect.Parameters["Color"].SetValue(oldColor);
         }
     }
 }
