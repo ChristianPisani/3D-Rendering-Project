@@ -14,26 +14,124 @@ namespace MatrixProjection
         public int divisions;
         public int heightDivisions = 1;
 
-        public Color color = Color.Pink; 
-
         public Cylinder(Vector3 pos, Vector3 size, int divisions) : base(pos, size)
         {
             this.divisions = divisions;
 
-            MapPoints();
+            MapVertices();
+            InitializeVertexBuffer();
         }
 
-        public void MapPoints()
+        public List<List<Vector3>> MapPoints()
         {
-            var points = new List<Vector3>();
+            var points = new List<List<Vector3>>();
+
+            points.Add(new List<Vector3>());
+            points.Add(new List<Vector3>());
 
             var step = (Math.PI * 2f) / (divisions);
 
             for (int x = 0; x < divisions; x++)
-            {                
-                points.Add(new Vector3(((float)Math.Cos(step * x) * 0.5f), -1f, ((float)Math.Sin(step * x) * 0.5f)));
-                points.Add(new Vector3(((float)Math.Cos(step * x) * 0.5f), 0f, ((float)Math.Sin(step * x) * 0.5f)));
+            {
+                points[0].Add(new Vector3(((float)Math.Cos(step * x) * 0.5f), -1f, ((float)Math.Sin(step * x) * 0.5f)));
+                points[1].Add(new Vector3(((float)Math.Cos(step * x) * 0.3f), 0f, ((float)Math.Sin(step * x) * 0.3f)));
             }
+
+            return points;
+        }
+
+        public override void MapVertices()
+        {
+            /*
+             * 
+             * I could say I will refactor this later, but that is a big fat lie
+             * 
+             */
+
+            var points = MapPoints();
+            vertices = new List<CustomVertex>();
+
+            for (int y = 0; y < points.Count; y++)
+            {
+                for (int x = 0; x < points[y].Count; x++)
+                {
+                    CustomVertex v = new CustomVertex();
+                    CustomVertex v1 = new CustomVertex();
+                    CustomVertex v2 = new CustomVertex();
+
+                    v.Position = points[y][x];
+                    v1.Position = points[y][(x + 1) % points[y].Count];
+                    v2.Position = new Vector3(0, points[y][x].Y, 0);
+
+                    Vector3 normal = getVertexNormal(v2.Position, v1.Position, v.Position);
+
+                    if(y == 1)
+                    {
+                        normal *= -1;
+                    }
+
+                    v.Normal = normal;
+                    v1.Normal = normal;
+                    v2.Normal = normal;
+                    if (y == 0)
+                    {
+                        vertices.Add(v2);
+                        vertices.Add(v1);
+                        vertices.Add(v);
+                    } else
+                    {
+                        vertices.Add(v);
+                        vertices.Add(v1);
+                        vertices.Add(v2);
+                    }
+
+                    if (y < 1)
+                    {
+                        CustomVertex v3 = new CustomVertex();
+                        CustomVertex v4 = new CustomVertex();
+                        CustomVertex v5 = new CustomVertex();
+
+                        v3.Position = points[y][x];
+                        v4.Position = points[y + 1][x];
+                        v5.Position = points[y][(x + 1) % points[y].Count];
+
+                        normal = getVertexNormal(v5.Position, v4.Position, v3.Position);
+                        v3.Normal = normal;
+                        v4.Normal = normal;
+                        v5.Normal = normal;
+
+                        vertices.Add(v5);
+                        vertices.Add(v4);
+                        vertices.Add(v3);
+                    }
+                    if(y >= 1)
+                    {
+                        CustomVertex v3 = new CustomVertex();
+                        CustomVertex v4 = new CustomVertex();
+                        CustomVertex v5 = new CustomVertex();
+
+                        v3.Position = points[y][(x + 1) % points[y].Count];
+                        v4.Position = points[y - 1][(x + 1) % points[y].Count];
+                        v5.Position = points[y][x];
+
+                        normal = getVertexNormal(v5.Position, v4.Position, v3.Position);
+                        v3.Normal = normal;
+                        v4.Normal = normal;
+                        v5.Normal = normal;
+
+                        vertices.Add(v5);
+                        vertices.Add(v4);
+                        vertices.Add(v3);
+                    }
+                }
+            }
+        }
+
+        public override void Update(double gameTime)
+        {
+            base.Update(gameTime);
+
+            this.rotation = Matrix.CreateRotationY((float)gameTime/1000f) * Matrix.CreateRotationZ((float)Math.Sin(gameTime/1000f));
         }
 
 
