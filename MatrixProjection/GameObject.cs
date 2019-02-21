@@ -22,6 +22,8 @@ namespace MatrixProjection
 
         private GraphicsDevice graphicsDevice;
 
+        public Color color = Color.White;
+
         Vector3[] points = {
             new Vector3 (0, 0, 0),
             new Vector3 (1, 0, 0),
@@ -30,7 +32,8 @@ namespace MatrixProjection
             new Vector3 (0, 1, 1),
             new Vector3 (1, 1, 1),
             new Vector3 (1, 0, 1),
-            new Vector3 (0, 0, 1) };
+            new Vector3 (0, 0, 1)
+        };
 
 
         int[] triangles = {
@@ -97,9 +100,9 @@ namespace MatrixProjection
 
                 normal = getVertexNormal(v.Position, v1.Position, v2.Position);
 
-                //v.Normal = normal;
-                //v1.Normal = normal;
-                //v2.Normal = normal;
+                v.Normal = normal;
+                v1.Normal = normal;
+                v2.Normal = normal;
 
                 vertices.Add(v);
                 vertices.Add(v1);
@@ -109,7 +112,15 @@ namespace MatrixProjection
 
         public void InitializeVertexBuffer()
         {
-            vertexBuffer = new VertexBuffer(graphicsDevice, CustomVertex.VertexDeclaration, vertices.Count, BufferUsage.WriteOnly);
+            if (vertices.Count > 0)
+            {
+                vertexBuffer = new VertexBuffer(graphicsDevice, CustomVertex.VertexDeclaration, vertices.Count, BufferUsage.WriteOnly);
+                SetVertexData();
+            }
+        }
+
+        public void SetVertexData()
+        {
             vertexBuffer.SetData(vertices.ToArray());
         }
 
@@ -131,19 +142,26 @@ namespace MatrixProjection
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 effect.Parameters["World"].SetValue(rotation * scale * Matrix.CreateTranslation(pos));
+                effect.Parameters["Color"].SetValue(color.ToVector4());
 
-                pass.Apply();
-
-
-
-                /*graphicsDevice.DrawUserPrimitives(
-                            PrimitiveType.TriangleList,
-                    vertices.ToArray(),
-                    0,
-                    12);*/
+                pass.Apply();                
 
                 graphicsDevice.SetVertexBuffer(vertexBuffer);
                 graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertices.Count/3);
+            }
+        }
+
+        public virtual void DrawForOcclusion(GraphicsDevice graphicsDevice, Camera camera, Effect effect)
+        {
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                effect.Parameters["World"].SetValue(rotation * scale * Matrix.CreateTranslation(pos));
+                effect.Parameters["Color"].SetValue(Color.Black.ToVector4());
+
+                pass.Apply();
+
+                graphicsDevice.SetVertexBuffer(vertexBuffer);
+                graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertices.Count / 3);
             }
         }
     }
