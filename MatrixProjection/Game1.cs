@@ -34,6 +34,9 @@ namespace MatrixProjection
         bool Paused = false;
         bool PausePressed = false;
 
+        bool Filled = false;
+        bool FilledPressed = false;
+
         //Object composition
         Vector2 mid;
         int size = 50;
@@ -45,6 +48,9 @@ namespace MatrixProjection
 
 
         Effect effect;
+
+
+        RasterizerState rasterizerState = new RasterizerState();
 
         public Game1()
         {
@@ -81,20 +87,17 @@ namespace MatrixProjection
             Cube c = new Cube(new Vector3(50, 50, 50), new Vector3(100, 100, 100));
             //gameObjects.Add(c);
 
-            for (int i = 0; i < 10f; i++)
-            {
-                Cylinder cyl = new Cylinder(new Vector3(0, -500 * i, 0), new Vector3(400f, 500f, 400f), 10);
-                //gameObjects.Add(cyl);
-            }
+            Cylinder cyl = new Cylinder(new Vector3(-500, -500, -500), new Vector3(400f, 500f, 400f), 20);
+            gameObjects.Add(cyl);
 
 
-            //gameObjects.Add(new Plane(new Vector3(0, 0, 0), new Vector2(400, 400), 20));
-            gameObjects.Add(new Plane(new Vector3(450, 0, 0), new Vector2(400, 400), 1));
+            gameObjects.Add(new Plane(new Vector3(0, 0, 0), new Vector2(400, 400), 20));
+            gameObjects.Add(new Plane(new Vector3(450, 0, 0), new Vector2(400, 400), 2));
 
             flocks = new List<Flock>();
 
-            flocks.Add(new Flock(300, new Vector3(5000, 5000, 5000), Color.White * 0.8f, Vector3.Zero));
-            flocks.Add(new Flock(200, new Vector3(5000, 5000, 4999), Color.Orange * 0.8f, Vector3.Zero));
+            flocks.Add(new Flock(300, new Vector3(5000, 5000, 5000), Color.White, Vector3.Zero));
+            flocks.Add(new Flock(200, new Vector3(5000, 5000, 4999), Color.Aqua, Vector3.Zero));
 
             foreach (Flock flock in flocks)
             {
@@ -115,20 +118,23 @@ namespace MatrixProjection
             effect = vertexShader;
 
             //effect = new BasicEffect(graphics.GraphicsDevice);
-            effect.CurrentTechnique = effect.Techniques["BasicColorDrawing"];
+            effect.CurrentTechnique = effect.Techniques["BasicColorDrawing"];           
             //effect.Parameters["projection"].SetValue(camera.ProjectionMatrix);
             //effect.Parameters["Color"].SetValue(Color.SeaShell.ToVector4());
+            effect.Parameters["LightPos"].SetValue(new Vector3(4000, 4000, 4000));
+            effect.Parameters["LightPower"].SetValue(1f);
+            effect.Parameters["LightColor"].SetValue(new Vector4(0.6f, 0.3f, 0, 1));
+            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(0.3f, 0.1f, 0.1f, 0.1f));
             //effect.AmbientLightColor = new Vector3(.7f, .2f, .4f);
             //effect.Texture = pixel;
             //effect.EmissiveColor = new Vector3(1, 0, 0);
             //effect.TextureEnabled = true;
             //effect.EnableDefaultLighting();
 
-            RasterizerState r = new RasterizerState();
-            r.FillMode = FillMode.WireFrame;
-            r.CullMode = CullMode.None;
+            rasterizerState.FillMode = FillMode.Solid;
+            rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = r;            
+            GraphicsDevice.RasterizerState = rasterizerState;            
         }
 
 
@@ -153,8 +159,34 @@ namespace MatrixProjection
                     PausePressed = false;
                 }
             }
-            camera.Update();
+            if (Keyboard.GetState().IsKeyDown(Keys.F))
+            {
+                FilledPressed = true;
+            }
+            else
+            {
+                if (FilledPressed)
+                {
+                    RasterizerState r = new RasterizerState();
+                    r.CullMode = rasterizerState.CullMode;
 
+                    if (Filled)
+                    {
+                        r.FillMode = FillMode.Solid;
+                        GraphicsDevice.RasterizerState = r;
+                    } else
+                    {                        
+                        r.FillMode = FillMode.WireFrame;
+                        r.CullMode = CullMode.None;
+                        GraphicsDevice.RasterizerState = r;
+                    }
+
+                    Filled = !Filled;
+                    FilledPressed = false;
+                }
+            }
+            camera.Update();
+            
             if (Paused)
             {
                 return;
@@ -191,6 +223,7 @@ namespace MatrixProjection
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Teal);
+            //GraphicsDevice.Clear(Color.White);
 
             effect.Parameters["ViewProjection"].SetValue(camera.ViewMatrix * camera.ProjectionMatrix);
 
@@ -207,19 +240,20 @@ namespace MatrixProjection
     {
         public Vector3 Position;
         public Color Color;
-        //public Vector3 Normal;
+        public Vector3 Normal;
 
-        public CustomVertex(Vector3 position, Color color)
+        public CustomVertex(Vector3 position, Color color, Vector3 normal)
         {
             this.Position = position;
             this.Color = color;
-            //this.Normal = normal;
+            this.Normal = normal;
         }
 
         public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration
              (
                  new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-                 new VertexElement(sizeof(float) * 3, VertexElementFormat.Color, VertexElementUsage.Color, 0)
+                 new VertexElement(sizeof(float) * 3, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+                 new VertexElement(sizeof(float) * 3 + sizeof(byte) * 4, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0)
              );
     }
 }
