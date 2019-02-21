@@ -122,9 +122,9 @@ namespace MatrixProjection
             //effect.Parameters["projection"].SetValue(camera.ProjectionMatrix);
             //effect.Parameters["Color"].SetValue(Color.SeaShell.ToVector4());
             effect.Parameters["LightPos"].SetValue(new Vector3(4000, 4000, 4000));
-            effect.Parameters["LightPower"].SetValue(1f);
+            effect.Parameters["LightPower"].SetValue(2f);
             effect.Parameters["LightColor"].SetValue(new Vector4(0.6f, 0.3f, 0, 1));
-            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(0.3f, 0.1f, 0.1f, 0.1f));
+            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(.2f, .2f, .4f, 1f));
             //effect.AmbientLightColor = new Vector3(.7f, .2f, .4f);
             //effect.Texture = pixel;
             //effect.EmissiveColor = new Vector3(1, 0, 0);

@@ -56,7 +56,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     diffuseLightingFactor = saturate(diffuseLightingFactor);
     diffuseLightingFactor *= LightPower;
     
-    input.Color = Color*(LightColor + diffuseLightingFactor + AmbientLightColor);
+    input.Color = input.Color * LightColor * (diffuseLightingFactor + AmbientLightColor);
     return input.Color;
 }
 
