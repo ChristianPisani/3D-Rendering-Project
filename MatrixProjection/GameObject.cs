@@ -25,14 +25,14 @@ namespace MatrixProjection
         public Color color = Color.White;
 
         Vector3[] points = {
-            new Vector3 (0, 0, 0),
-            new Vector3 (1, 0, 0),
-            new Vector3 (1, 1, 0),
-            new Vector3 (0, 1, 0),
-            new Vector3 (0, 1, 1),
-            new Vector3 (1, 1, 1),
-            new Vector3 (1, 0, 1),
-            new Vector3 (0, 0, 1)
+            new Vector3 (-.5f, -.5f, -.5f),
+            new Vector3 (.5f, -.5f, -.5f),
+            new Vector3 (.5f, .5f, -.5f),
+            new Vector3 (-.5f, .5f, -.5f),
+            new Vector3 (-.5f, .5f, .5f),
+            new Vector3 (.5f, .5f, .5f),
+            new Vector3 (.5f, -.5f, .5f),
+            new Vector3 (-.5f, -.5f, .5f)
         };
 
 
@@ -107,7 +107,7 @@ namespace MatrixProjection
                 vertices.Add(v);
                 vertices.Add(v1);
                 vertices.Add(v2);
-            }            
+            }
         }
 
         public void InitializeVertexBuffer()
@@ -141,13 +141,13 @@ namespace MatrixProjection
         {
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
-                effect.Parameters["World"].SetValue(rotation * scale * Matrix.CreateTranslation(pos));
+                effect.Parameters["World"].SetValue(scale * rotation * Matrix.CreateTranslation(pos));
                 effect.Parameters["Color"].SetValue(color.ToVector4());
 
-                pass.Apply();                
+                pass.Apply();
 
                 graphicsDevice.SetVertexBuffer(vertexBuffer);
-                graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertices.Count/3);
+                graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, vertices.Count / 3);
             }
         }
 
