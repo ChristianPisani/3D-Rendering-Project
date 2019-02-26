@@ -125,5 +125,24 @@ namespace MatrixProjection.Helpers
 
             return rotation;
         }
+
+        // From here (translated from c++): https://stackoverflow.com/questions/26017467/rotate-object-to-look-at-another-object-in-3-dimensions
+        public static Matrix RotateTowardMatrix(Vector3 origin, Vector3 target)
+        {
+            Vector3 objectUpVector = new Vector3(0.0f, 1.0f, 0.0f);
+
+            Vector3 zaxis = Vector3.Normalize(target - origin);
+            Vector3 xaxis = Vector3.Normalize(Vector3.Cross(objectUpVector, zaxis));
+            Vector3 yaxis = Vector3.Cross(zaxis, xaxis);
+
+            Matrix pm = new Matrix(
+                new Vector4(xaxis.X, xaxis.Y, xaxis.Z, 0),
+                new Vector4(yaxis.X, yaxis.Y, yaxis.Z, 0),
+                new Vector4(zaxis.X, zaxis.Y, zaxis.Z, 0),
+                new Vector4(0, 0, 0, 1)
+            );
+
+            return pm;
+        }
     }
 }

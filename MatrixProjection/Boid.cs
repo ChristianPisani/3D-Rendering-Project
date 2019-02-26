@@ -69,57 +69,8 @@ namespace MatrixProjection
 
             this.pos += vel;
             this.vel += acl;
-
-            Vector3 A = vel;
-            A.Normalize();
-            A *= new Vector3(0.1f);
-
-            Vector3 pA = prevVel;
-            pA.Normalize();
-            pA *= new Vector3(0.1f);
-
-            A = Vector3.Lerp(pA, A, 0.3f);
-
-            Vector3 diff = prevVel - vel;
-
-            float a = (float)Math.Atan2(A.Z, A.X);
-            float b = (float)Math.Atan(A.Y);
-
-            float pitch = (float)Math.Asin(A.Y);
-            float yaw = (float)Math.Atan2(A.X, A.Z);
-
-            float ang = (float)Math.Acos(Vector3.Dot(pos, A));
-
-            Vector3 axis = Vector3.Normalize(Vector3.Cross(pos, A));
-
-            Quaternion Q = Quaternion.CreateFromAxisAngle(axis, ang);
-
-
-            Vector3 objectUpVector = new Vector3(0.0f, 1.0f, 0.0f);
-
-            Vector3 zaxis = Vector3.Normalize(vel);
-            Vector3 xaxis = Vector3.Normalize(Vector3.Cross(objectUpVector, zaxis));
-            Vector3 yaxis = Vector3.Cross(zaxis, xaxis);
-
-            Matrix pm = new Matrix(
-                new Vector4(xaxis.X, xaxis.Y, xaxis.Z, 0),
-                new Vector4(yaxis.X, yaxis.Y, yaxis.Z, 0),
-                new Vector4(zaxis.X, zaxis.Y, zaxis.Z, 0),
-                new Vector4(0, 0, 0, 1)
-            );
-            this.rotation = pm;
-
-            //this.rotation = Matrix.CreateFromAxisAngle(axis, ang);
-            //this.rotation = Matrix.CreateFromYawPitchRoll(pitch, -yaw, 0);
-            //this.rotation = Matrix.CreateRotationZ(b) * Matrix.CreateRotationY(a);
-            //this.rotation = Matrix.CreateRotationZ(angle); //* Matrix.CreateRotationY(a);
-
-            //this.rotation = Matrix.CreateRotationX((float)Math.Cos(angle)) * Matrix.CreateRotationY((float)Math.Sin(angle)) 
-            //    * Matrix.CreateRotationZ((float)Math.Sin(angle2));
-            //this.rotation = Matrix.CreateTranslation(new Vector3(1)) * Matrix.CreateLookAt(Vector3.Zero, A, new Vector3(0, 1, 0));
-            //this.rotation = Matrix.CreateRotationY((float)(angle)) * Matrix.CreateRotationZ(angle) * Matrix.CreateRotationX(angle);
-            //this.rotation = MatrixHelper.directionRotationMatrix(A);
-            //this.rotation = Matrix.CreateFromQuaternion(Matrix.CreateLookAt(Vector3.Zero, vel, new Vector3(0, 1, 0)).Rotation);
+            
+            this.rotation = MatrixHelper.RotateTowardMatrix(Vector3.Zero, vel);
 
             this.acl = Vector3.Zero;
 
