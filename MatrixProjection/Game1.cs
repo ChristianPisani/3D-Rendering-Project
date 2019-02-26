@@ -90,6 +90,38 @@ namespace MatrixProjection
             Cylinder cyl = new Cylinder(new Vector3(-500, -500, -500), new Vector3(400f, 500f, 400f), 20);
             gameObjects.Add(cyl);
 
+            int numBoxes = 10;
+            float radius = 300;
+            float step = (float)(Math.PI * 2) / numBoxes;
+
+            gameObjects.Add(new Cube(new Vector3(0, 25, 1000), new Vector3(50)));
+
+            for (float x = 0; x < Math.PI * 2; x += step)
+            {
+
+                Cube cube = new Cube(
+                    new Vector3((float)Math.Sin(x) * radius, (float)Math.Cos(x) * radius, 1000),
+                    new Vector3(50)
+                );
+
+                Cube cube2 = new Cube(
+                    new Vector3((float)Math.Sin(x) * radius, 25, (float)Math.Cos(x) * radius + 1000),
+                    new Vector3(50)
+                );
+                //cube.rotation = Matrix.CreateLookAt(Vector3.Normalize(new Vector3(-25, -25, 1000)), Vector3.Normalize(cube.pos), new Vector3(0, 1, 0));
+                var orig = new Vector3(25, 25, 1000);
+                var d = cube.pos - orig;
+                d.Normalize();
+                double yaw = Math.Atan2(d.X, d.Y);
+                double pitch = Math.Atan2(d.Z, Math.Sqrt((d.X * d.X) + (d.Y * d.Y)));
+                cube.rotation = Matrix.CreateRotationX(0) * Matrix.CreateRotationY((float)pitch) * Matrix.CreateRotationZ((float)yaw); //Roll == 0
+
+                gameObjects.Add(cube);
+                gameObjects.Add(cube2);
+
+
+            }
+
 
             gameObjects.Add(new Plane(new Vector3(0, 0, 0), new Vector2(400, 400), 20));
             gameObjects.Add(new Plane(new Vector3(450, 0, 0), new Vector2(400, 400), 2));
@@ -118,7 +150,7 @@ namespace MatrixProjection
             effect = vertexShader;
 
             //effect = new BasicEffect(graphics.GraphicsDevice);
-            effect.CurrentTechnique = effect.Techniques["BasicColorDrawing"];           
+            effect.CurrentTechnique = effect.Techniques["BasicColorDrawing"];
             //effect.Parameters["projection"].SetValue(camera.ProjectionMatrix);
             //effect.Parameters["Color"].SetValue(Color.SeaShell.ToVector4());
             effect.Parameters["LightPos"].SetValue(new Vector3(4000, 4000, 4000));
@@ -134,7 +166,7 @@ namespace MatrixProjection
             rasterizerState.FillMode = FillMode.Solid;
             rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = rasterizerState;            
+            GraphicsDevice.RasterizerState = rasterizerState;
         }
 
 
@@ -174,8 +206,9 @@ namespace MatrixProjection
                     {
                         r.FillMode = FillMode.Solid;
                         GraphicsDevice.RasterizerState = r;
-                    } else
-                    {                        
+                    }
+                    else
+                    {
                         r.FillMode = FillMode.WireFrame;
                         r.CullMode = CullMode.None;
                         GraphicsDevice.RasterizerState = r;
@@ -186,7 +219,7 @@ namespace MatrixProjection
                 }
             }
             camera.Update();
-            
+
             if (Paused)
             {
                 return;
@@ -209,7 +242,35 @@ namespace MatrixProjection
                     //cube.pos.Y = (float)Math.Sin(yPos / (Math.Sin(angle) * 200)) * 100;
                     //cube.pos.Y += (float)Math.Sin(angle + (yPos/150)) * 10;
 
-                    gameObject.rotation = Matrix.CreateLookAt(Vector3.Normalize(gameObject.pos), Vector3.Zero, new Vector3(0, 1, 0));
+                    var orig = new Vector3(0, 25, 1000);
+                    var d = cube.pos - orig;
+                    d.Normalize();
+                    float a = Math.Abs((float)Math.Atan2(d.Y, d.X));
+                    float b = Math.Abs((float)Math.Atan2(d.Z, d.X));
+
+                    if (cube.pos != orig)
+                    {
+                        //cube.rotation = Matrix.CreateRotationY(b) * Matrix.CreateRotationZ(a);// * Matrix.CreateRotationZ(a);  
+                        //Vector3 lookat = { lookAtPosition.x, lookAtPosition.y, lookAtPosition.z };
+                        //Vector3 pos = { position.x, position.y, position.z };
+                        Vector3 objectUpVector = new Vector3(0.0f, 1.0f, 0.0f);
+
+                        Vector3 zaxis = Vector3.Normalize(orig - cube.pos);
+                        Vector3 xaxis = Vector3.Normalize(Vector3.Cross(objectUpVector, zaxis));
+                        Vector3 yaxis = Vector3.Cross(zaxis, xaxis);
+
+                        Matrix pm = new Matrix(
+                            new Vector4(xaxis.X, xaxis.Y, xaxis.Z, 0),
+                            new Vector4(yaxis.X, yaxis.Y, yaxis.Z, 0),
+                            new Vector4(zaxis.X, zaxis.Y, zaxis.Z, 0),
+                            new Vector4(0, 0, 0, 1)
+                        );
+
+                        cube.rotation = pm;// Matrix.CreateLookAt(Vector3.Normalize(orig), Vector3.Normalize(cube.pos), Vector3.Up);
+                    }
+
+
+                    //gameObject.rotation = Matrix.CreateLookAt(Vector3.Normalize(gameObject.pos), Vector3.Normalize(orig), new Vector3(0, 1, 0));
                     //gameObject.rotation *= Matrix.CreateRotationX(angle);
                 }
 
@@ -226,6 +287,7 @@ namespace MatrixProjection
             //GraphicsDevice.Clear(Color.White);
 
             effect.Parameters["ViewProjection"].SetValue(camera.ViewMatrix * camera.ProjectionMatrix);
+            effect.Parameters["CameraPos"].SetValue(camera.pos);
 
             foreach (var gameObject in gameObjects)
             {
