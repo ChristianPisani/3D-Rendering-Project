@@ -10,18 +10,7 @@ using System.Threading.Tasks;
 namespace MatrixProjection
 {
     public class Cube : GameObject
-    {
-        Vector3[] vertices = {
-            new Vector3 (0, 0, 0),
-            new Vector3 (1, 0, 0),
-            new Vector3 (1, 1, 0),
-            new Vector3 (0, 1, 0),
-            new Vector3 (0, 1, 1),
-            new Vector3 (1, 1, 1),
-            new Vector3 (1, 0, 1),
-            new Vector3 (0, 0, 1) };
-
-
+    {        
         int[] triangles = {
                 0, 2, 1, //face front
 	    		0, 3, 2,
