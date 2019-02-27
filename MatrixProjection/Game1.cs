@@ -29,8 +29,9 @@ namespace MatrixProjection
         //Objects
         public List<GameObject> gameObjects;
         public List<Flock> flocks;
+        public Player player;
 
-
+        //Gamestates
         bool Paused = false;
         bool PausePressed = false;
 
@@ -88,7 +89,7 @@ namespace MatrixProjection
             //gameObjects.Add(c);
 
             Cylinder cyl = new Cylinder(new Vector3(-500, -500, -500), new Vector3(400f, 500f, 400f), 20);
-            gameObjects.Add(cyl);
+            //gameObjects.Add(cyl);
 
             int numBoxes = 10;
             float radius = 300;
@@ -117,8 +118,8 @@ namespace MatrixProjection
             }
 
 
-            gameObjects.Add(new Plane(new Vector3(0, 0, 0), new Vector2(400, 400), 20));
-            gameObjects.Add(new Plane(new Vector3(450, 0, 0), new Vector2(400, 400), 2));
+            //gameObjects.Add(new Plane(new Vector3(0, 0, 0), new Vector2(400, 400), 20));
+            //gameObjects.Add(new Plane(new Vector3(450, 0, 0), new Vector2(400, 400), 2));
 
             flocks = new List<Flock>();
 
@@ -127,8 +128,12 @@ namespace MatrixProjection
 
             foreach (Flock flock in flocks)
             {
-                gameObjects.AddRange(flock.flock);
+                //gameObjects.AddRange(flock.flock);
             }
+
+
+            player = new Player(new Vector3(0, -40, 0), new Vector3(20, 40, 20), 1);
+            gameObjects.Add(player);
 
             base.Initialize();
         }
@@ -145,7 +150,8 @@ namespace MatrixProjection
 
             //effect = new BasicEffect(graphics.GraphicsDevice);
             effect.CurrentTechnique = effect.Techniques["BasicColorDrawing"];
-            //effect.Parameters["projection"].SetValue(camera.ProjectionMatrix);
+            //effect.CurrentTechnique = effect.Techniques["DepthMap"];            
+            effect.Parameters["Projection"].SetValue(camera.projectionMatrix);
             //effect.Parameters["Color"].SetValue(Color.SeaShell.ToVector4());
             effect.Parameters["LightPos"].SetValue(new Vector3(4000, 4000, 4000));
             effect.Parameters["LightPower"].SetValue(2f);
@@ -212,6 +218,11 @@ namespace MatrixProjection
                     FilledPressed = false;
                 }
             }
+            camera.controlsEnabled = false;
+            Vector3 oldPos = new Vector3(player.pos.X, player.pos.Y, player.pos.Z);
+            camera.Follow(player.pos, new Vector3(0, 20, 500), 1);
+            camera.RotateAround(player.pos, player.angle, 1f);
+            camera.LookToward(Vector3.Lerp(oldPos, player.pos, 0.01f));
             camera.Update();
 
             if (Paused)
@@ -250,7 +261,7 @@ namespace MatrixProjection
             GraphicsDevice.Clear(Color.Teal);
             //GraphicsDevice.Clear(Color.White);
 
-            effect.Parameters["ViewProjection"].SetValue(camera.ViewMatrix * camera.ProjectionMatrix);
+            effect.Parameters["View"].SetValue(camera.viewMatrix);
             effect.Parameters["CameraPos"].SetValue(camera.pos);
 
             foreach (var gameObject in gameObjects)
@@ -258,29 +269,15 @@ namespace MatrixProjection
                 gameObject.Draw(graphics.GraphicsDevice, camera, effect);
             }
 
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, rasterizerState);
+
+            spriteBatch.DrawString(gameFont, player.pos.ToString(), new Vector2(30, 30), Color.White);
+
+            spriteBatch.End();
+
             base.Draw(gameTime);
         }
-    }
-
-    public struct CustomVertex
-    {
-        public Vector3 Position;
-        public Color Color;
-        public Vector3 Normal;
-
-        public CustomVertex(Vector3 position, Color color, Vector3 normal)
-        {
-            this.Position = position;
-            this.Color = color;
-            this.Normal = normal;
-        }
-
-        public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration
-             (
-                 new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-                 new VertexElement(sizeof(float) * 3, VertexElementFormat.Color, VertexElementUsage.Color, 0),
-                 new VertexElement(sizeof(float) * 3 + sizeof(byte) * 4, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0)
-             );
     }
 }
 

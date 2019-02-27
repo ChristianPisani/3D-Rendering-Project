@@ -22,19 +22,19 @@ namespace MatrixProjection
             InitializeVertexBuffer();
         }
 
-        public List<List<Vector3>> MapPoints()
+        public List<List<Vector4>> MapPoints()
         {
-            var points = new List<List<Vector3>>();
+            var points = new List<List<Vector4>>();
 
-            points.Add(new List<Vector3>());
-            points.Add(new List<Vector3>());
+            points.Add(new List<Vector4>());
+            points.Add(new List<Vector4>());
 
             var step = (Math.PI * 2f) / (divisions);
 
             for (int x = 0; x < divisions; x++)
             {
-                points[0].Add(new Vector3(((float)Math.Cos(step * x) * 0.5f), -1f, ((float)Math.Sin(step * x) * 0.5f)));
-                points[1].Add(new Vector3(((float)Math.Cos(step * x) * 0.3f), 0f, ((float)Math.Sin(step * x) * 0.3f)));
+                points[0].Add(new Vector4(((float)Math.Cos(step * x) * 0.5f), -1f, ((float)Math.Sin(step * x) * 0.5f), 1));
+                points[1].Add(new Vector4(((float)Math.Cos(step * x) * 0.3f), 0f, ((float)Math.Sin(step * x) * 0.3f), 1));
             }
 
             return points;
@@ -61,11 +61,13 @@ namespace MatrixProjection
 
                     v.Position = points[y][x];
                     v1.Position = points[y][(x + 1) % points[y].Count];
-                    v2.Position = new Vector3(0, points[y][x].Y, 0);
+                    v2.Position = new Vector4(0, points[y][x].Y, 0, 1);
 
-                    Vector3 normal = getVertexNormal(v2.Position, v1.Position, v.Position);
+                    Vector3 normal = getVertexNormal(new Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
+                                                     new Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
+                                                     new Vector3(v.Position.X, v.Position.Y, v.Position.Z));
 
-                    if(y == 1)
+                    if (y == 1)
                     {
                         normal *= -1;
                     }
@@ -95,7 +97,9 @@ namespace MatrixProjection
                         v4.Position = points[y + 1][x];
                         v5.Position = points[y][(x + 1) % points[y].Count];
 
-                        normal = getVertexNormal(v5.Position, v4.Position, v3.Position);
+                        normal = getVertexNormal(new Vector3(v5.Position.X, v5.Position.Y, v5.Position.Z),
+                                                 new Vector3(v4.Position.X, v4.Position.Y, v4.Position.Z),
+                                                 new Vector3(v3.Position.X, v3.Position.Y, v3.Position.Z));
                         v3.Normal = normal;
                         v4.Normal = normal;
                         v5.Normal = normal;
@@ -114,7 +118,9 @@ namespace MatrixProjection
                         v4.Position = points[y - 1][(x + 1) % points[y].Count];
                         v5.Position = points[y][x];
 
-                        normal = getVertexNormal(v5.Position, v4.Position, v3.Position);
+                        normal = getVertexNormal(new Vector3(v5.Position.X, v5.Position.Y, v5.Position.Z),
+                                                 new Vector3(v4.Position.X, v4.Position.Y, v4.Position.Z),
+                                                 new Vector3(v3.Position.X, v3.Position.Y, v3.Position.Z));
                         v3.Normal = normal;
                         v4.Normal = normal;
                         v5.Normal = normal;

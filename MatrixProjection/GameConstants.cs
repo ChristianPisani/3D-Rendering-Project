@@ -11,21 +11,24 @@ namespace MatrixProjection
     {
         public static readonly float gravity = 0.7f;
 
-        public static Vector2 SpringForce(Vector2 anchor, Vector2 pos, Vector2 vel)
+        public static Vector3 SpringForce(Vector3 anchor, Vector3 pos, Vector3 vel)
         {
-            Vector2 fX = new Vector2(anchor.X - pos.X,
-                                  anchor.Y - pos.Y);
+            Vector3 fX = new Vector3(anchor.X - pos.X,
+                                     anchor.Y - pos.Y,
+                                     anchor.Z - pos.Z);
             float length = fX.Length();
             float d = 100;
             float k = (-0.003f) * 20;
             float b = (0.005f) * 20;
             float lenD = length - d;
-            Vector2 springForce = new Vector2(((-k * (MathHelper.Clamp(lenD, 0, d))) * (fX.X / length)) - (b * vel.X),
-                                             ((-k * (MathHelper.Clamp(lenD, 0, d))) * (fX.Y / length)) - (b * vel.Y));
+            Vector3 springForce = new Vector3(((-k * (MathHelper.Clamp(lenD, 0, d))) * (fX.X / length)) - (b * vel.X),
+                                              ((-k * (MathHelper.Clamp(lenD, 0, d))) * (fX.Y / length)) - (b * vel.Y),
+                                              ((-k * (MathHelper.Clamp(lenD, 0, d))) * (fX.Z / length)) - (b * vel.Z));
 
             float maxForce = 2;
             springForce.X = MathHelper.Clamp(springForce.X, -maxForce, maxForce);
             springForce.Y = MathHelper.Clamp(springForce.Y, -maxForce, maxForce);
+            springForce.Z = MathHelper.Clamp(springForce.Z, -maxForce, maxForce);
 
             return springForce;
         }

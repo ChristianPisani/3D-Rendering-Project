@@ -22,11 +22,11 @@ namespace MatrixProjection
 
         private Vector3 prevPos;        
 
-        Vector3[] points = {
-            new Vector3 (0, 0, 1),
-            new Vector3 (-.5f, -.5f, -1),
-            new Vector3 (.5f, -.5f, -1),
-            new Vector3 (0, .5f, -1),
+        Vector4[] points = {
+            new Vector4 (0, 0, 1, 1),
+            new Vector4 (-.5f, -.5f, -1, 1),
+            new Vector4 (.5f, -.5f, -1, 1),
+            new Vector4 (0, .5f, -1, 1),
         };
 
         int[] triangles = {
@@ -166,7 +166,9 @@ namespace MatrixProjection
                 v1.Position = points[points.Length - 1 - index1];
                 v2.Position = points[points.Length - 1 - index2];
 
-                Vector3 normal = getVertexNormal(v.Position, v1.Position, v2.Position);
+                Vector3 normal = getVertexNormal(new Vector3(v.Position.X, v.Position.Y, v.Position.Z),
+                                                 new Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
+                                                 new Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z));
                 
                 v.Normal = normal;
                 v1.Normal = normal;

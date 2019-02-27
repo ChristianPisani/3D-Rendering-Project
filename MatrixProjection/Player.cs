@@ -1,4 +1,5 @@
-﻿/*using Microsoft.Xna.Framework;
+﻿using MatrixProjection.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MatrixProjection
 {
-    public class Player : Object
+    public class Player : PhysicsObject
     {
         //Controls
         KeyboardState ks;
@@ -23,34 +24,41 @@ namespace MatrixProjection
         int curJumpFrames = 0;
         bool jumpPressed = false;
 
-        Point speed = new Point(6, 6);
-        float maxVel = 22;
-        float jumpStrength = 4;
+        Vector3 speed = new Vector3(1, 1, 1);
+        float maxVel = 8;
+        float jumpStrength = 2;
 
-        float webLength = 0;
-        Vector2 anchor = new Vector2(600, 0);
+        float webLength = 400;
+        Vector3 anchor = new Vector3(600, 0, 0);
 
-        public Player(Vector2 pos, float mass, int w, int h) : base(pos, mass, w, h)
+        public Vector2 angle = new Vector2(0, 0);
+
+        Cube web;
+        Cube webEnd;
+
+        public Player(Vector3 pos, Vector3 size, float mass) : base(pos, size, mass)
         {
-            
+            web = new Cube(pos, new Vector3(2, webLength, 2));
+            web.color = Color.Blue;
+            webEnd = new Cube(pos, new Vector3(5, 5, 5));
+            webEnd.color = Color.Blue;
         }
 
-        public override void Update()
+        public override void Update(double gameTime)
         {
-            base.Update();
+            base.Update(gameTime);
 
             HandleInput();
 
             vel.X = MathHelper.Clamp(vel.X, -maxVel, maxVel);
-
-            float dAngle = (float)Math.Atan2(-(double)Vector2.Normalize(vel).X, 1);
-            angle = MathHelper.Lerp(angle, dAngle, 0.1f);            
-
-            if (pos.Y >= Game1.gameBounds.Height - bounds.Height)
+            vel.Z = MathHelper.Clamp(vel.Z, -maxVel, maxVel);
+            
+            if (pos.Y >= 0)
             {
                 canJump = true;
                 curJumpFrames = 0;
                 vel.X = MathHelper.Lerp(vel.X, 0, 0.2f);
+                vel.Z = MathHelper.Lerp(vel.Z, 0, 0.2f);
             }
             else
             {
@@ -60,29 +68,33 @@ namespace MatrixProjection
             {
                 canJump = false;                
             }
+
+            pos.Y = Math.Min(0, pos.Y);
+            //pos.X = MathHelper.Clamp(pos.X, 0, 1000);
+            //pos.Z = MathHelper.Clamp(pos.Z, 0, 1000);
+
+
+            web.pos = pos; //new Vector3(0, webLength / 2, 0) ;
+            webEnd.pos = anchor;
+            web.size.Y = webLength;
+            web.scale = Matrix.CreateScale(web.size);
+            web.rotation = Matrix.CreateTranslation(new Vector3(0, -webLength/2, 0)) * MatrixHelper.RotateTowardMatrix(pos, anchor) * Matrix.CreateRotationX(MathHelper.ToRadians(90)); 
         }
 
-        public override void Draw(SpriteBatch spriteBatch, Texture2D tex, Camera camera)
+        public override void Draw(GraphicsDevice graphicsDevice, Camera camera, Effect effect)
         {
-            //float length = MathHelper.Lerp(webLength, (bounds.Center.ToVector2() - anchor).Length(), 0.1f);
-            float length = (bounds.Center.ToVector2() - anchor).Length();
+            float length = (pos - anchor).Length();
             webLength = length;
-            double angle = Math.Atan2(anchor.Y - bounds.Center.Y, anchor.X - bounds.Center.X);
+            //double angle = Math.Atan2(anchor.Y - bounds.Center.Y, anchor.X - bounds.Center.X);
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed || ks.IsKeyDown(Keys.E))
             {
-                spriteBatch.Draw(tex,
-                    bounds.Center.ToVector2() - camera.pos,
-                    new Rectangle(0, 0, (int)length, 2),
-                    Color.White,
-                    (float)angle,
-                    Vector2.Zero,
-                    Vector2.One,
-                    SpriteEffects.None,
-                    1);
-            }
+                //Draw web
+                web.Draw(graphicsDevice, camera, effect);
+                webEnd.Draw(graphicsDevice, camera, effect);
+            }            
 
-            base.Draw(spriteBatch, tex, camera);            
+            base.Draw(graphicsDevice, camera, effect);            
         }       
 
         public void HandleInput()
@@ -90,33 +102,49 @@ namespace MatrixProjection
             ks = Keyboard.GetState();
             MouseState ms = Mouse.GetState();
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed || ks.IsKeyDown(Keys.E))
+            if (ks.IsKeyDown(Keys.E))
             {
-                Vector2 sp = GameConstants.SpringForce(anchor, pos, new Vector2(vel.X/3, vel.Y));
+                Vector3 sp = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z));
                 ApplyForce(sp);
-            } else
+            }
+            if(!ks.IsKeyDown(Keys.E))
             {
-                anchor.X = ms.Position.X + Game1.camera.pos.X;
-                anchor.Y = ms.Position.Y + Game1.camera.pos.Y;
+                anchor = pos + (vel * 100);
+                anchor.Y = pos.Y - 400;
                 webLength = 0;
             }
 
-            if (ks.IsKeyDown(leftKey))
+            Vector3 forwardVector = new Vector3(0, 0, -1);
+            Vector3 sideVector = new Vector3(-1, 0, 0);
+            
+            var rotationMatrix = Matrix.CreateRotationY(angle.X);
+            forwardVector = Vector3.Transform(forwardVector, rotationMatrix) * speed;
+            sideVector = Vector3.Transform(sideVector, rotationMatrix) * speed;
+
+            if (Keyboard.GetState().IsKeyDown(upKey))
             {
-                ApplyForce(new Vector2(-speed.X, 0));                
+                ApplyForce(forwardVector);
             }
-            if (ks.IsKeyDown(rightKey))
+
+            if (Keyboard.GetState().IsKeyDown(downKey))
             {
-                ApplyForce(new Vector2(speed.X, 0));
+                ApplyForce(-forwardVector);
             }
-            if (ks.IsKeyDown(upKey))
+
+            float angularSpeed = 0.05f;
+            rotation = Matrix.CreateRotationY(angle.X);
+            if (Keyboard.GetState().IsKeyDown(leftKey))
             {
-                //ApplyForce(new Vector2(0, -speed.Y));                
+                angle.X -= angularSpeed;
             }
-            if (ks.IsKeyDown(downKey))
+
+            if (Keyboard.GetState().IsKeyDown(rightKey))
             {
-                //ApplyForce(new Vector2(0, speed.Y));                
+                angle.X += angularSpeed;
             }
+
+
+
             if (ks.IsKeyDown(jumpKey))
             {
                 jumpPressed = true;
@@ -130,23 +158,23 @@ namespace MatrixProjection
 
                     if (curJumpFrames == 0)
                     {
-                        ApplyForce(new Vector2(0, -vel.Y));
+                        ApplyForce(new Vector3(0, -vel.Y, 0));
                     }
 
                     curJumpFrames++;
 
-                    ApplyForce(new Vector2(0, -jumpStrength));
+                    ApplyForce(new Vector3(0, -jumpStrength, 0));
                 }
                 else
                 {
-                    angle = MathHelper.ToRadians(-360);
+                    //angle = MathHelper.ToRadians(-360);
                 }
             } 
             if(ks.IsKeyUp(jumpKey))
             {
                 if(jumpPressed)
                 {
-                    ApplyForce(Vector2.Normalize(vel) * 15);
+                    ApplyForce(Vector3.Normalize(vel) * 15);
 
                     jumpPressed = false;
                 }
@@ -154,4 +182,3 @@ namespace MatrixProjection
         }
     }
 }
-*/

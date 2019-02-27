@@ -14,35 +14,43 @@ namespace MatrixProjection
     {
         public GraphicsDevice graphicsDevice;
 
-        public Vector3 pos = new Vector3(0, -10, 20);
+        public Vector3 pos = new Vector3(-1000, -500, 1000);
         Vector3 lookStraightVector = new Vector3(0, -.5f, -1f);
 
-        Vector2 angle;
+        public Vector2 angle;
 
         Vector3 up = new Vector3(0, -1, 0);
+
+        public bool controlsEnabled = true;
 
         public float FOV = Microsoft.Xna.Framework.MathHelper.PiOver4;
         public float nearClipPlane = 1;
         public float farClipPlane = 50000;
 
-        public Vector3 lookAt
+        const float camSpeed = 0.04f;
+        const float camMoveSpeed = 10;
+
+        Matrix rotationMatrix;
+
+
+        public Vector3 lookAt;
+        public Matrix viewMatrix;
+        public Matrix projectionMatrix;
+
+        Vector3 createLookAt
         {
             get
             {
-                var rotationMatrix = Matrix.CreateRotationX(angle.Y) * Matrix.CreateRotationY(angle.X);
-
                 Vector3 lookAtVector = Vector3.Transform(lookStraightVector, rotationMatrix);
                 lookAtVector += pos;
                 return lookAtVector;
             }
         }
 
-        public Matrix ViewMatrix
+        public Matrix createViewMatrix
         {
             get
-            {
-                var rotationMatrix = Matrix.CreateRotationX(angle.Y) * Matrix.CreateRotationY(angle.X);
-
+            {                
                 Vector3 lookAtVector = Vector3.Transform(lookStraightVector, rotationMatrix);
                 lookAtVector += pos;
 
@@ -51,7 +59,7 @@ namespace MatrixProjection
             }
         }
 
-        public Matrix ProjectionMatrix
+        public Matrix createProjectionMatrix
         {
             get
             {
@@ -65,15 +73,57 @@ namespace MatrixProjection
         public Camera(GraphicsDevice graphicsDevice)
         {
             this.graphicsDevice = graphicsDevice;
+
+            projectionMatrix = createProjectionMatrix;
         }
 
         public void Update()
-        {
-            var camSpeed = 0.04f;
-            var camMoveSpeed = 10;
+        {            
+            if(controlsEnabled)
+            {
+                ControlCamera();
+            }
+            ControlCameraLookAt();
 
-            var forwardVector = new Vector3(0, 0, -1);
-            var sideVector = new Vector3(-1, 0, 0);
+            angle.Y = MathHelper.Clamp(angle.Y, (float)-Math.PI / 3, (float)Math.PI / 2);
+
+            lookAt = createLookAt;
+            //viewMatrix = createViewMatrix;
+
+        }
+
+        public void Follow(Vector3 target, Vector3 distance, float followStrength)
+        {
+            pos = Vector3.Lerp(pos, target - distance, followStrength);
+        }
+
+        public void RotateAround(Vector3 target, float rotateStrength)
+        {
+            RotateAround(target, angle, rotateStrength);
+        }
+
+        public void RotateAround(Vector3 target, Vector2 targetRotation, float rotateStrength)
+        {
+            Vector3 newPos;
+
+            float dist = (target - pos).Length();
+            newPos.X = target.X + (float)Math.Sin(targetRotation.X) * dist;
+            newPos.Z = target.Z + (float)Math.Cos(targetRotation.X) * dist;
+
+            newPos.Y = target.Y + (float)Math.Sin(angle.Y) * dist;
+
+            pos = Vector3.Lerp(pos, newPos, rotateStrength);
+        }
+
+        public void LookToward(Vector3 target)
+        {
+            viewMatrix = Matrix.CreateLookAt(pos, target, up);
+        }
+
+        public void ControlCamera()
+        {
+            Vector3 forwardVector = new Vector3(0, 0, -1);
+            Vector3 sideVector = new Vector3(-1, 0, 0);
 
             var rotationMatrix = Matrix.CreateRotationY(angle.X);
             forwardVector = Vector3.Transform(forwardVector, rotationMatrix) * camMoveSpeed;
@@ -108,7 +158,14 @@ namespace MatrixProjection
             {
                 pos.Y -= camMoveSpeed;
             }
+            
+            lookAt = createLookAt;
+            viewMatrix = createViewMatrix;
 
+        }
+
+        public void ControlCameraLookAt()
+        {
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
                 angle.X -= camSpeed;
@@ -126,6 +183,8 @@ namespace MatrixProjection
             {
                 angle.Y -= camSpeed;
             }
-        }
+
+            //rotationMatrix = Matrix.CreateRotationX(angle.Y) * Matrix.CreateRotationY(angle.X);
+        }        
     }
 }

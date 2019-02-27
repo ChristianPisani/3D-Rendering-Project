@@ -24,15 +24,15 @@ namespace MatrixProjection
 
         public Color color = Color.White;
 
-        Vector3[] points = {
-            new Vector3 (-.5f, -.5f, -.5f),
-            new Vector3 (.5f, -.5f, -.5f),
-            new Vector3 (.5f, .5f, -.5f),
-            new Vector3 (-.5f, .5f, -.5f),
-            new Vector3 (-.5f, .5f, .5f),
-            new Vector3 (.5f, .5f, .5f),
-            new Vector3 (.5f, -.5f, .5f),
-            new Vector3 (-.5f, -.5f, .5f)
+        Vector4[] points = {
+            new Vector4 (-.5f, -.5f, -.5f, 1),
+            new Vector4 (.5f, -.5f, -.5f, 1),
+            new Vector4 (.5f, .5f, -.5f, 1),
+            new Vector4 (-.5f, .5f, -.5f, 1),
+            new Vector4 (-.5f, .5f, .5f, 1),
+            new Vector4 (.5f, .5f, .5f, 1),
+            new Vector4 (.5f, -.5f, .5f, 1),
+            new Vector4 (-.5f, -.5f, .5f, 1)
         };
 
 
@@ -98,7 +98,9 @@ namespace MatrixProjection
 
                 Vector3 normal = Vector3.Zero;
 
-                normal = getVertexNormal(v.Position, v1.Position, v2.Position);
+                normal = getVertexNormal(new Vector3(v.Position.X, v.Position.Y, v.Position.Z),
+                                                 new Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
+                                                 new Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z));
 
                 v.Normal = normal;
                 v1.Normal = normal;
@@ -130,6 +132,11 @@ namespace MatrixProjection
             Vector3 norm = dir / dir.Length();
 
             return norm;
+        }
+
+        public Vector3 getVertexNormal(Vector4 a, Vector4 b, Vector4 c)
+        {
+            return getVertexNormal(new Vector3(a.X, a.Y, a.Z), new Vector3(b.X, b.Y, b.Z), new Vector3(c.X, c.Y, c.Z));
         }
 
         public virtual void Update(double gameTime)

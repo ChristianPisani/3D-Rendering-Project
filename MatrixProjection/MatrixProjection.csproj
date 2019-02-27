@@ -43,11 +43,13 @@
   <ItemGroup>
     <Compile Include="Boid.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="CustomVertex.cs" />
     <Compile Include="Cylinder.cs" />
     <Compile Include="Flock.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Helpers\Drawing.cs" />
     <Compile Include="Helpers\MatrixHelper.cs" />
+    <Compile Include="PhysicsObject.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="Cube.cs" />
     <Compile Include="Game1.cs" />
