@@ -44,9 +44,9 @@ namespace MatrixProjection
         {
             inRangeOfPlayer = false;
             color = Color.Gray;
-            if(Vector3.Distance(pos, playerpos) < 4000)
+            if(Vector2.Distance(new Vector2(pos.X, pos.Z), new Vector2(playerpos.X, playerpos.Z)) < 20000)
             {
-                color = Color.Red;
+                //color = Color.Red;
                 inRangeOfPlayer = true;
             }
             if(Selected)

@@ -56,14 +56,12 @@ namespace MatrixProjection
             Cube closestCube = new Cube(Vector3.Zero, Vector3.Zero);
             foreach (Cube c in colObjects)
             {
-                double angle = Math.Atan2((c.pos.Z - pos.Z), (c.pos.X - pos.X) - Game1.camera.angle.X);
-
-                var dist = Vector3.Distance(pos, c.pos);
-                
-                var dot = Vector3.Dot(Game1.camera.pos, c.pos);
-                if (c.size.Y > 100 && dist > 500 && dist < closestDist && angle > 0)
+                var dist = c.pos - pos;
+                   
+                var dot = Vector3.Dot(Vector3.Normalize(dist), forwardVector);
+                if (c.size.Y > 100 && dist.Length() > 500 && dist.Length() < closestDist && dot > 0 && dot > 0.5f)
                 {
-                    closestDist = dist;
+                    closestDist = dist.Length();
                     closestDot = dot;
                     closestCube = c;                    
                     
@@ -126,6 +124,7 @@ namespace MatrixProjection
             }
 
             pos.Y = Math.Min(0, pos.Y);
+            
             //pos.X = MathHelper.Clamp(pos.X, 0, 1000);
             //pos.Z = MathHelper.Clamp(pos.Z, 0, 1000);
 
@@ -173,12 +172,12 @@ namespace MatrixProjection
             {
                 //Vector3 sp = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z));
                 //ApplyForce(sp);
-                //Vector3 f = (anchor - pos) / 100;
-                Vector3 f = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z), MathHelper.Clamp(webLength * 0.75f, 1000, 100000));
-
+                Vector3 f = (anchor - pos) / 100;
+                //Vector3 f = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z), MathHelper.Clamp(webLength * 0.75f, 1000, 100000));
                 f.Y = Math.Min(f.Y, 0);
                 f = Vector3.Clamp(f, new Vector3(-5), new Vector3(5));
                 ApplyForce(f);
+                ApplyForce(new Vector3(forwardVector.X, 0, forwardVector.Z) * 10);
                 ApplyForce(new Vector3(0, GameConstants.gravity, 0));
             }
             if(!ks.IsKeyDown(Keys.E))

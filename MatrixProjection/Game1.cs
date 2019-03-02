@@ -148,7 +148,7 @@ namespace MatrixProjection
             {
                 for(int y = 0; y < 10; y++)
                 {
-                    int size = 10000;
+                    int size = 30000;
                     Cube c = new Cube(new Vector3(x * size, 0, y * size), new Vector3(size, 1, size), new Vector3(0, 0.5f, 0));
 
                     gameObjects.Add(c);
@@ -164,7 +164,7 @@ namespace MatrixProjection
                         {
                             if(rnd.Next(0, 10) == 1)
                             {
-                                var buildingHeight = rnd.Next(1000, 4000);
+                                var buildingHeight = rnd.Next(5000, 10000);
                                 c = new Cube(new Vector3(x * size + xx * buildingSize, -buildingHeight/2, y * size + yy * buildingSize), new Vector3(buildingSize, buildingHeight, buildingSize));
                                 gameObjects.Add(c);
                             }
