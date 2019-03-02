@@ -26,9 +26,36 @@ namespace MatrixProjection
 		    	0, 1, 6
             };
 
+        public bool inRangeOfPlayer = false;
+
+        public bool Selected = false;
+
         public Cube(Vector3 pos, Vector3 size) : base(pos, size)
         {
 
         }
+
+        public Cube(Vector3 pos, Vector3 size, Vector3 origin) : base(pos, size, origin)
+        {
+
+        }
+
+        public void Update(double gameTime, Vector3 playerpos)
+        {
+            inRangeOfPlayer = false;
+            color = Color.Gray;
+            if(Vector3.Distance(pos, playerpos) < 4000)
+            {
+                color = Color.Red;
+                inRangeOfPlayer = true;
+            }
+            if(Selected)
+            {
+                color = Color.Green;
+            }
+            Selected = false;
+
+            base.Update(gameTime);
+        }        
     }
 }

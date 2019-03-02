@@ -102,7 +102,7 @@ namespace MatrixProjection
 
         public void DrawBounds(Camera camera, GraphicsDevice graphicsDevice, BasicEffect effect)
         {
-            Cube c = new Cube(pos, bounds);
+            Cube c = new Cube(pos, bounds, Vector3.Zero);
             c.Draw(graphicsDevice, camera, effect);
 
             foreach(Boid b in flock)

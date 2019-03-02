@@ -11,14 +11,14 @@ namespace MatrixProjection
     {
         public static readonly float gravity = 0.7f;
 
-        public static Vector3 SpringForce(Vector3 anchor, Vector3 pos, Vector3 vel)
+        public static Vector3 SpringForce(Vector3 anchor, Vector3 pos, Vector3 vel, float Length)
         {
             Vector3 fX = new Vector3(anchor.X - pos.X,
                                      anchor.Y - pos.Y,
                                      anchor.Z - pos.Z);
             float length = fX.Length();
-            float d = 100;
-            float k = (-0.003f) * 20;
+            float d = Length;
+            float k = (-0.003f) * 50;
             float b = (0.005f) * 20;
             float lenD = length - d;
             Vector3 springForce = new Vector3(((-k * (MathHelper.Clamp(lenD, 0, d))) * (fX.X / length)) - (b * vel.X),

@@ -12,7 +12,7 @@ namespace MatrixProjection
         public Vector3 vel;
         public Vector3 acl;
         public float mass;
-        bool onGround = false;
+        public bool onGround = false;
 
         public PhysicsObject(Vector3 pos, Vector3 size, float mass) : base(pos, size)
         {            
@@ -40,14 +40,7 @@ namespace MatrixProjection
             vel += acl;
             pos += vel;
 
-            if (pos.Y >= 0)
-            {
-                onGround = true;
-            }
-            else
-            {
-                onGround = false;
-            }
+            onGround = false;
 
             this.acl = Vector3.Zero;
 

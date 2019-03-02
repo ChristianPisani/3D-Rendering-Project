@@ -114,9 +114,9 @@ namespace MatrixProjection
                         CustomVertex v4 = new CustomVertex();
                         CustomVertex v5 = new CustomVertex();
 
-                        v3.Position = points[y][(x + 1) % points[y].Count];
-                        v4.Position = points[y - 1][(x + 1) % points[y].Count];
-                        v5.Position = points[y][x];
+                        v3.Position = origin + points[y][(x + 1) % points[y].Count];
+                        v4.Position = origin + points[y - 1][(x + 1) % points[y].Count];
+                        v5.Position = origin + points[y][x];
 
                         normal = getVertexNormal(new Vector3(v5.Position.X, v5.Position.Y, v5.Position.Z),
                                                  new Vector3(v4.Position.X, v4.Position.Y, v4.Position.Z),

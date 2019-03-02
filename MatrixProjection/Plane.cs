@@ -56,10 +56,10 @@ namespace MatrixProjection
                     CustomVertex v4 = new CustomVertex();
                     CustomVertex v5 = new CustomVertex();
 
-                    v.Position = points[x][y];
-                    v1.Position = points[x+1][y];
-                    v2.Position = points[x][y+1];
-                    v3.Position = points[x + 1][y + 1];
+                    v.Position = origin + points[x][y];
+                    v1.Position = origin + points[x+1][y];
+                    v2.Position = origin + points[x][y+1];
+                    v3.Position = origin + points[x + 1][y + 1];
 
                     v.Normal = getVertexNormal(new Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
                                                  new Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),

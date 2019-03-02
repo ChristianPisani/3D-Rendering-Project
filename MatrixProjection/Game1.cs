@@ -80,7 +80,7 @@ namespace MatrixProjection
                 {
                     float yPos = (Vector2.Distance(mid, new Vector2(x * size, y * size))) / 2;
 
-                    gameObjects.Add(new Cube(new Vector3(x * 250 + size, -1000, y * 250 + size), new Vector3(size, size, size)));
+                    //gameObjects.Add(new Cube(new Vector3(x * 250 + size, -1000, y * 250 + size), new Vector3(size, size, size)));
                 }
             }
 
@@ -95,7 +95,7 @@ namespace MatrixProjection
             float radius = 300;
             float step = (float)(Math.PI * 2) / numBoxes;
 
-            gameObjects.Add(new Cube(new Vector3(0, 25, 1000), new Vector3(50)));
+           // gameObjects.Add(new Cube(new Vector3(0, 25, 1000), new Vector3(50)));
 
             for (float x = 0; x < Math.PI * 2; x += step)
             {
@@ -113,8 +113,8 @@ namespace MatrixProjection
                 cube.rotation = MatrixHelper.RotateTowardMatrix(cube.pos, orig);
                 cube2.rotation = MatrixHelper.RotateTowardMatrix(cube2.pos, orig);
 
-                gameObjects.Add(cube);
-                gameObjects.Add(cube2);
+                //gameObjects.Add(cube);
+                //gameObjects.Add(cube2);
             }
 
 
@@ -128,14 +128,50 @@ namespace MatrixProjection
 
             foreach (Flock flock in flocks)
             {
-                //gameObjects.AddRange(flock.flock);
+                gameObjects.AddRange(flock.flock);
             }
 
 
             player = new Player(new Vector3(0, -40, 0), new Vector3(20, 40, 20), 1);
+            player.SetOrigin(new Vector3(0, -.5f, 0));
+            player.color = Color.Red;
             gameObjects.Add(player);
 
+            CreateCity();
+
             base.Initialize();
+        }
+
+        public void CreateCity()
+        {
+            for(int x = 0; x < 10; x++)
+            {
+                for(int y = 0; y < 10; y++)
+                {
+                    int size = 10000;
+                    Cube c = new Cube(new Vector3(x * size, 0, y * size), new Vector3(size, 1, size), new Vector3(0, 0.5f, 0));
+
+                    gameObjects.Add(c);
+
+
+                    var rnd = new Random();
+
+                    int divisions = 10;
+                    int buildingSize = size / divisions;
+                    for(int xx = 0; xx < divisions; xx++)
+                    {
+                        for(int yy = 0; yy < divisions; yy++)
+                        {
+                            if(rnd.Next(0, 10) == 1)
+                            {
+                                var buildingHeight = rnd.Next(1000, 4000);
+                                c = new Cube(new Vector3(x * size + xx * buildingSize, -buildingHeight/2, y * size + yy * buildingSize), new Vector3(buildingSize, buildingHeight, buildingSize));
+                                gameObjects.Add(c);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         protected override void LoadContent()
@@ -154,9 +190,9 @@ namespace MatrixProjection
             effect.Parameters["Projection"].SetValue(camera.projectionMatrix);
             //effect.Parameters["Color"].SetValue(Color.SeaShell.ToVector4());
             effect.Parameters["LightPos"].SetValue(new Vector3(4000, 4000, 4000));
-            effect.Parameters["LightPower"].SetValue(2f);
-            effect.Parameters["LightColor"].SetValue(new Vector4(0.6f, 0.3f, 0, 1));
-            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(.2f, .2f, .4f, 1f));
+            effect.Parameters["LightPower"].SetValue(0.5f);
+            effect.Parameters["LightColor"].SetValue(new Vector4(0.6f, 0.6f, .6f, 1));
+            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(.4f, .4f, .4f, 1f));
             //effect.AmbientLightColor = new Vector3(.7f, .2f, .4f);
             //effect.Texture = pixel;
             //effect.EmissiveColor = new Vector3(1, 0, 0);
@@ -220,8 +256,8 @@ namespace MatrixProjection
             }
             camera.controlsEnabled = false;
             Vector3 oldPos = new Vector3(player.pos.X, player.pos.Y, player.pos.Z);
-            camera.Follow(player.pos, new Vector3(0, 20, 500), 1);
-            camera.RotateAround(player.pos, player.angle, 1f);
+            camera.Follow(player.pos, new Vector3(0, 20, 1000), 1);
+            camera.RotateAround(player.pos, player.angle + camera.angle, 1f);
             camera.LookToward(Vector3.Lerp(oldPos, player.pos, 0.01f));
             camera.Update();
 
@@ -247,10 +283,15 @@ namespace MatrixProjection
                     //cube.pos.Y = (float)Math.Sin(yPos / (Math.Sin(angle) * 200)) * 100;
                     //cube.pos.Y += (float)Math.Sin(angle + (yPos/150)) * 10;                    
 
+                    cube.Update(gameTime.TotalGameTime.TotalMilliseconds, player.pos);
+                } else if(gameObject is Player p)
+                {
+                    p.Update(gameTime.TotalGameTime.TotalMilliseconds, gameObjects.Where(m => m is Cube && (m as Cube).inRangeOfPlayer).Cast<Cube>().ToList());
+                } else
+                {
+                    gameObject.Update(gameTime.TotalGameTime.TotalMilliseconds);
+
                 }
-
-                gameObject.Update(gameTime.TotalGameTime.TotalMilliseconds);
-
             }
 
             base.Update(gameTime);
@@ -272,7 +313,9 @@ namespace MatrixProjection
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, rasterizerState);
 
-            spriteBatch.DrawString(gameFont, player.pos.ToString(), new Vector2(30, 30), Color.White);
+            double angle = Math.Atan2((0 - player.pos.Z), (0 - player.pos.X) - Game1.camera.angle.X);
+
+            spriteBatch.DrawString(gameFont, (Vector3.Dot(Vector3.Normalize(camera.lookAt), Vector3.Normalize(Vector3.One))).ToString(), new Vector2(30, 30), Color.White);
 
             spriteBatch.End();
 

@@ -24,6 +24,8 @@ namespace MatrixProjection
 
         public Color color = Color.White;
 
+        public Vector4 origin = Vector4.Zero;
+
         Vector4[] points = {
             new Vector4 (-.5f, -.5f, -.5f, 1),
             new Vector4 (.5f, -.5f, -.5f, 1),
@@ -61,6 +63,11 @@ namespace MatrixProjection
             new Vector3(0, -1, 0)
         };
 
+        public GameObject() : this(Vector3.Zero, Vector3.One)
+        {
+            
+        }
+
         public GameObject(Vector3 pos, Vector3 size)
         {
             this.graphicsDevice = Game1.graphics.GraphicsDevice;
@@ -82,6 +89,18 @@ namespace MatrixProjection
             InitializeVertexBuffer();
         }
 
+        public GameObject(Vector3 pos, Vector3 size, Vector3 origin) : this(pos, size)
+        {
+            this.origin = new Vector4(origin, 0);
+        }
+
+        public void SetOrigin(Vector3 origin)
+        {
+            this.origin = new Vector4(origin, 0);
+            MapVertices();
+            InitializeVertexBuffer();
+        }
+
         public virtual void MapVertices()
         {
             vertices = new List<CustomVertex>();
@@ -92,9 +111,9 @@ namespace MatrixProjection
                 CustomVertex v1 = new CustomVertex();
                 CustomVertex v2 = new CustomVertex();
 
-                v.Position = points[triangles[i]];
-                v1.Position = points[triangles[i + 1]];
-                v2.Position = points[triangles[i + 2]];
+                v.Position = origin + points[triangles[i]];
+                v1.Position = origin + points[triangles[i + 1]];
+                v2.Position = origin + points[triangles[i + 2]];
 
                 Vector3 normal = Vector3.Zero;
 

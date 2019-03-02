@@ -34,26 +34,82 @@ namespace MatrixProjection
         public Vector2 angle = new Vector2(0, 0);
 
         Cube web;
-        Cube webEnd;
+
+        readonly Vector3 baseForwardVector = new Vector3(0, 0, -1);
+        readonly Vector3 baseSideVector = new Vector3(-1, 0, 0);
+        Vector3 forwardVector = new Vector3(0, 0, -1);
+        Vector3 sideVector = new Vector3(-1, 0, 0);
 
         public Player(Vector3 pos, Vector3 size, float mass) : base(pos, size, mass)
         {
             web = new Cube(pos, new Vector3(2, webLength, 2));
-            web.color = Color.Blue;
-            webEnd = new Cube(pos, new Vector3(5, 5, 5));
-            webEnd.color = Color.Blue;
+            web.SetOrigin(new Vector3(0, -.5f, 0));
+            web.color = Color.LightCoral;       
         }
 
-        public override void Update(double gameTime)
+        public void Update(double gameTime, List<Cube> colObjects)
         {
             base.Update(gameTime);
 
-            HandleInput();
+            float closestDist = float.MaxValue;
+            float closestDot = 100000000000000000;
+            Cube closestCube = new Cube(Vector3.Zero, Vector3.Zero);
+            foreach (Cube c in colObjects)
+            {
+                double angle = Math.Atan2((c.pos.Z - pos.Z), (c.pos.X - pos.X) - Game1.camera.angle.X);
+
+                var dist = Vector3.Distance(pos, c.pos);
+                
+                var dot = Vector3.Dot(Game1.camera.pos, c.pos);
+                if (c.size.Y > 100 && dist > 500 && dist < closestDist && angle > 0)
+                {
+                    closestDist = dist;
+                    closestDot = dot;
+                    closestCube = c;                    
+                    
+                }
+
+
+                if (pos.X > c.pos.X - c.size.X / 2 && pos.X < c.pos.X + c.size.X / 2 &&
+                    pos.Y > 10 + c.pos.Y - c.size.Y / 2 && pos.Y < c.pos.Y + c.size.Y / 2 &&
+                    pos.Z > c.pos.Z - c.size.Z / 2 && pos.Z < c.pos.Z + c.size.Z / 2)
+                {
+                    color = Color.Green;
+                    vel.Y = 0;
+                    onGround = true;
+                    if (pos.Y > c.pos.Y - c.size.Y / 2 && pos.Y < c.pos.Y + c.size.Y / 2)
+                    {
+                        //pos.Y = c.pos.Y - c.size.Y / 2;
+                    }
+
+                    if (pos.X > c.pos.X - c.size.X / 2 && pos.X < c.pos.X + c.size.X / 2)
+                    {
+                        pos.X -= vel.X * 2;
+                    }
+
+                    if (pos.Z > c.pos.Z - c.size.Z / 2 && pos.Z < c.pos.Z + c.size.Z / 2)
+                    {
+                        pos.Z -= vel.Z * 2;
+                    }
+                    break;
+                }
+                else
+                {
+                    color = Color.Red;
+                }
+            }
+            closestCube.Selected = true;
+            if (!ks.IsKeyDown(Keys.E))
+            {
+                anchor = closestCube.pos - new Vector3(0, closestCube.size.Y/2, 0);
+            }
+
+            HandleInput();            
 
             vel.X = MathHelper.Clamp(vel.X, -maxVel, maxVel);
             vel.Z = MathHelper.Clamp(vel.Z, -maxVel, maxVel);
             
-            if (pos.Y >= 0)
+            if (pos.Y >= 0 || onGround)
             {
                 canJump = true;
                 curJumpFrames = 0;
@@ -74,11 +130,20 @@ namespace MatrixProjection
             //pos.Z = MathHelper.Clamp(pos.Z, 0, 1000);
 
 
-            web.pos = pos; //new Vector3(0, webLength / 2, 0) ;
-            webEnd.pos = anchor;
+            web.pos = pos - new Vector3(0, size.Y / 2f, 0);       
             web.size.Y = webLength;
             web.scale = Matrix.CreateScale(web.size);
-            web.rotation = Matrix.CreateTranslation(new Vector3(0, -webLength/2, 0)) * MatrixHelper.RotateTowardMatrix(pos, anchor) * Matrix.CreateRotationX(MathHelper.ToRadians(90)); 
+            web.rotation = Matrix.CreateRotationX(MathHelper.ToRadians(90)) * Matrix.CreateRotationY(MathHelper.ToRadians(180)) * MatrixHelper.RotateTowardMatrix(web.pos, anchor);            
+
+            if (!canJump || onGround)
+            {
+                var v = Vector3.One;
+                if (vel.X != 0 || vel.Z != 0) v = vel;
+                rotation = MatrixHelper.RotateTowardMatrix(pos, pos + vel);
+            } else
+            {
+               // rotation = Matrix.CreateRotationY(0);
+            }
         }
 
         public override void Draw(GraphicsDevice graphicsDevice, Camera camera, Effect effect)
@@ -90,9 +155,11 @@ namespace MatrixProjection
             if (Mouse.GetState().LeftButton == ButtonState.Pressed || ks.IsKeyDown(Keys.E))
             {
                 //Draw web
-                web.Draw(graphicsDevice, camera, effect);
-                webEnd.Draw(graphicsDevice, camera, effect);
-            }            
+                //web.Draw(graphicsDevice, camera, effect);
+
+            }
+            web.Draw(graphicsDevice, camera, effect);
+
 
             base.Draw(graphicsDevice, camera, effect);            
         }       
@@ -104,19 +171,26 @@ namespace MatrixProjection
 
             if (ks.IsKeyDown(Keys.E))
             {
-                Vector3 sp = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z));
-                ApplyForce(sp);
+                //Vector3 sp = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z));
+                //ApplyForce(sp);
+                //Vector3 f = (anchor - pos) / 100;
+                Vector3 f = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z), MathHelper.Clamp(webLength * 0.75f, 1000, 100000));
+
+                f.Y = Math.Min(f.Y, 0);
+                f = Vector3.Clamp(f, new Vector3(-5), new Vector3(5));
+                ApplyForce(f);
+                ApplyForce(new Vector3(0, GameConstants.gravity, 0));
             }
             if(!ks.IsKeyDown(Keys.E))
             {
-                anchor = pos + (vel * 100);
-                anchor.Y = pos.Y - 400;
+                //anchor = pos + (vel * 100);
+                //anchor.Y = pos.Y - 400;
                 webLength = 0;
             }
 
-            Vector3 forwardVector = new Vector3(0, 0, -1);
-            Vector3 sideVector = new Vector3(-1, 0, 0);
-            
+            forwardVector = baseForwardVector;
+            sideVector = baseSideVector;
+
             var rotationMatrix = Matrix.CreateRotationY(angle.X);
             forwardVector = Vector3.Transform(forwardVector, rotationMatrix) * speed;
             sideVector = Vector3.Transform(sideVector, rotationMatrix) * speed;
