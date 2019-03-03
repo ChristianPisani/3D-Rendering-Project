@@ -24,9 +24,9 @@ namespace MatrixProjection
         int curJumpFrames = 0;
         bool jumpPressed = false;
 
-        Vector3 speed = new Vector3(1, 1, 1);
-        float maxVel = 8;
-        float jumpStrength = 2;
+        Vector3 speed = new Vector3(2);
+        float maxVel = 40;
+        float jumpStrength = 10;
 
         float webLength = 400;
         Vector3 anchor = new Vector3(600, 0, 0);
@@ -99,6 +99,7 @@ namespace MatrixProjection
             closestCube.Selected = true;
             if (!ks.IsKeyDown(Keys.E))
             {
+                //anchor = new Vector3(pos.X + forwardVector.X * 400, pos.Y - 400, pos.Z + forwardVector.Z * 400);
                 anchor = closestCube.pos - new Vector3(0, closestCube.size.Y/2, 0);
             }
 
@@ -148,7 +149,7 @@ namespace MatrixProjection
         public override void Draw(GraphicsDevice graphicsDevice, Camera camera, Effect effect)
         {
             float length = (pos - anchor).Length();
-            webLength = length;
+            webLength = MathHelper.Lerp(length, 4000, 0.005f);
             //double angle = Math.Atan2(anchor.Y - bounds.Center.Y, anchor.X - bounds.Center.X);
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed || ks.IsKeyDown(Keys.E))
@@ -172,13 +173,17 @@ namespace MatrixProjection
             {
                 //Vector3 sp = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z));
                 //ApplyForce(sp);
-                Vector3 f = (anchor - pos) / 100;
-                //Vector3 f = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z), MathHelper.Clamp(webLength * 0.75f, 1000, 100000));
-                f.Y = Math.Min(f.Y, 0);
-                f = Vector3.Clamp(f, new Vector3(-5), new Vector3(5));
-                ApplyForce(f);
-                ApplyForce(new Vector3(forwardVector.X, 0, forwardVector.Z) * 10);
-                ApplyForce(new Vector3(0, GameConstants.gravity, 0));
+
+                //Vector3 f = (anchor - pos) / 100;
+                //Vector3 f = GameConstants.SpringForce(anchor, pos, new Vector3(vel.X/3, vel.Y, vel.Z), MathHelper.Clamp(webLength * 0.9f, 1000, 100000));
+                //f.Y = Math.Min(f.Y, 0);
+                //f = Vector3.Clamp(f, new Vector3(-5), new Vector3(5));
+                //ApplyForce(f);
+
+                //ApplyForce(new Vector3(forwardVector.X, 0, forwardVector.Z) * 10);
+                //ApplyForce(new Vector3(0, GameConstants.gravity, 0));
+
+                StringForce(anchor, webLength, 0.5f);
             }
             if(!ks.IsKeyDown(Keys.E))
             {
@@ -236,7 +241,7 @@ namespace MatrixProjection
 
                     curJumpFrames++;
 
-                    ApplyForce(new Vector3(0, -jumpStrength, 0));
+                    ApplyForce(new Vector3(forwardVector.X * jumpStrength, -jumpStrength, forwardVector.Z * jumpStrength));
                 }
                 else
                 {

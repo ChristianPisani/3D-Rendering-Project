@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 namespace MatrixProjection
 {
     public class PhysicsObject : GameObject
-    {        
+    {
+        public Vector3 oldPos;
         public Vector3 vel;
         public Vector3 acl;
         public float mass;
@@ -19,6 +20,7 @@ namespace MatrixProjection
             this.vel = Vector3.Zero;
             this.acl = Vector3.Zero;
             this.mass = mass;
+            this.oldPos = pos;
         }
 
         public void ApplyForce(Vector3 force)
@@ -32,6 +34,8 @@ namespace MatrixProjection
 
         public override void Update(double gameTime)
         {
+            oldPos = new Vector3(pos.X, pos.Y, pos.Z);
+
             if (!onGround)
             {
                 ApplyForce(new Vector3(0, GameConstants.gravity, 0));
@@ -45,6 +49,17 @@ namespace MatrixProjection
             this.acl = Vector3.Zero;
 
             base.Update(gameTime);
+        }
+
+        public void StringForce(Vector3 origin, float length, float elasticity)
+        {
+            float distanceBetween = Vector3.Distance(origin, pos);
+            if (distanceBetween > length)
+            {
+                pos = origin + Vector3.Normalize(pos - origin) * MathHelper.Lerp(distanceBetween, length, elasticity);
+
+                vel = pos - oldPos;
+            }
         }
     }
 }

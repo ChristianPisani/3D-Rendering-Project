@@ -32,5 +32,17 @@ namespace MatrixProjection
 
             return springForce;
         }
+
+        public static void StringForce(Vector3 origin, ref PhysicsObject target, float length, float elasticity)
+        {
+            float distanceBetween = Vector3.Distance(origin, target.pos);
+            if (distanceBetween > length)
+            {                
+                target.pos = origin + Vector3.Normalize(target.pos - origin) * MathHelper.Lerp(distanceBetween, length, elasticity);
+
+                target.vel = target.pos - target.oldPos;
+                //ball.vel.y = min(ball.vel.y, 0);
+            }
+        }
     }
 }
