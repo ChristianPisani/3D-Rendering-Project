@@ -110,8 +110,8 @@ namespace MatrixProjection
                     new Vector3(50)
                 );
 
-                cube.rotation = MatrixHelper.RotateTowardMatrix(cube.pos, orig);
-                cube2.rotation = MatrixHelper.RotateTowardMatrix(cube2.pos, orig);
+                cube.Rotation = MatrixHelper.RotateTowardMatrix(cube.pos, orig);
+                cube2.Rotation = MatrixHelper.RotateTowardMatrix(cube2.pos, orig);
 
                 //gameObjects.Add(cube);
                 //gameObjects.Add(cube2);
@@ -137,7 +137,18 @@ namespace MatrixProjection
             player.color = Color.Red;
             gameObjects.Add(player);
 
-            CreateCity();
+
+            Plane plane = new Plane(new Vector3(100, 100, 100), new Vector2(1000, 1000), 1);
+            plane.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(90));
+            gameObjects.Add(plane);
+            Line line = new Line(new Vector3(260, 0, 60), new Vector3(50, 100, 50), 5);            
+            gameObjects.Add(line);
+
+            Cube kube = new Cube(IntersectionChecks.LinePlane(line, plane), new Vector3(10));
+            
+            gameObjects.Add(kube);
+
+            //CreateCity();
 
             base.Initialize();
         }
@@ -275,7 +286,7 @@ namespace MatrixProjection
 
             foreach (GameObject gameObject in gameObjects)
             {
-                if (gameObject is Cube cube)
+                if (gameObject is Cube cube && !(gameObject is Line))
                 {
                     //cube.pos.Y = ((float)Math.Sin(angle + cube.pos.X + cube.pos.Z)) * 100;
 

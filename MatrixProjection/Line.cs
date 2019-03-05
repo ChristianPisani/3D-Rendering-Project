@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MatrixProjection.Helpers;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,36 +8,21 @@ using System.Threading.Tasks;
 
 namespace MatrixProjection
 {
-    class Line : GameObject
+    class Line : Cube
     {
         public Vector3 end;
 
-        //Points that represents top of cube, which will be moved to create the line
-        int[] topPoints =
-        {
-            2, 3, 4, 5
-        };
-
-        public Line(Vector3 pos, Vector3 end) : base(pos, new Vector3(10, 10, 10))
+        public Line(Vector3 pos, Vector3 end, int thickness) : base(pos, new Vector3(thickness, thickness, thickness))
         {
             this.end = end;
-
-            foreach(int i in topPoints)
-            {
-                var vertex = vertices[i];
-                vertex.Position = new Vector4(end, 1);
-                vertices[i] = vertex;
-            }
+            SetOrigin(new Vector3(0, -.5f, 0));
         }
 
         public override void Update(double gameTime)
         {
-            foreach (int i in topPoints)
-            {
-                var vertex = vertices[i];
-                vertex.Position = new Vector4(end, 1);
-                vertices[i] = vertex;
-            }
+            size.Y = (end - pos).Length();
+            scale = Matrix.CreateScale(size);
+            Rotation = Matrix.CreateRotationX(MathHelper.ToRadians(90)) * Matrix.CreateRotationY(MathHelper.ToRadians(180)) * MatrixHelper.RotateTowardMatrix(pos, end);
 
             base.Update(gameTime);
         }

@@ -14,8 +14,16 @@ namespace MatrixProjection
         public Vector3 pos;
         public Vector3 size;
 
-        public Matrix rotation, scale;
+        public Matrix scale;
+        protected Matrix rotation;
 
+
+        public virtual Matrix Rotation
+        {
+            get { return rotation; }
+            set { rotation = value; }
+        } 
+        
         public List<CustomVertex> vertices;
 
         private VertexBuffer vertexBuffer;

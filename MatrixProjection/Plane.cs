@@ -12,13 +12,27 @@ namespace MatrixProjection
     public class Plane : GameObject
     {
         public int divisions;
+        public Vector3 normal;     
+
+        public override Matrix Rotation
+        {
+            get { return rotation; }
+            set {
+                rotation = value;
+                normal = Vector3.TransformNormal(normal, rotation);
+            }
+        }
 
         public Plane(Vector3 pos, Vector2 size, int divisions) : base(pos, new Vector3(size.X, size.X, size.Y))
         {
             this.divisions = divisions + 1;
             MapVertices();
-            InitializeVertexBuffer();
+            InitializeVertexBuffer();            
         }
+
+
+
+
 
         public List<List<Vector4>> MapPoints()
         {
@@ -61,11 +75,12 @@ namespace MatrixProjection
                     v2.Position = origin + points[x][y+1];
                     v3.Position = origin + points[x + 1][y + 1];
 
-                    v.Normal = getVertexNormal(new Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
+                    normal = getVertexNormal(new Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
                                                  new Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
                                                  new Vector3(v.Position.X, v.Position.Y, v.Position.Z));
-                    v1.Normal = v.Normal;
-                    v2.Normal = v.Normal;
+                    v.Normal = normal;
+                    v1.Normal = normal;
+                    v2.Normal = normal;
 
                     vertices.Add(v2);
                     vertices.Add(v1);
@@ -115,10 +130,12 @@ namespace MatrixProjection
                 }
             }
         }
-
+        
         public override void Update(double gameTime)
         {
             base.Update(gameTime);
+
+            return;
 
             float speedFactor = 4f;
             float angle = (float)(gameTime / 1000f) * speedFactor;

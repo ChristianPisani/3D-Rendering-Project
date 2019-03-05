@@ -24,8 +24,8 @@ namespace MatrixProjection
         int curJumpFrames = 0;
         bool jumpPressed = false;
 
-        Vector3 speed = new Vector3(2);
-        float maxVel = 40;
+        Vector3 speed = new Vector3(4);
+        float maxVel = 50;
         float jumpStrength = 10;
 
         float webLength = 400;
@@ -33,7 +33,7 @@ namespace MatrixProjection
 
         public Vector2 angle = new Vector2(0, 0);
 
-        Cube web;
+        Line web;
 
         readonly Vector3 baseForwardVector = new Vector3(0, 0, -1);
         readonly Vector3 baseSideVector = new Vector3(-1, 0, 0);
@@ -42,8 +42,7 @@ namespace MatrixProjection
 
         public Player(Vector3 pos, Vector3 size, float mass) : base(pos, size, mass)
         {
-            web = new Cube(pos, new Vector3(2, webLength, 2));
-            web.SetOrigin(new Vector3(0, -.5f, 0));
+            web = new Line(pos, new Vector3(2, webLength, 2), 2);            
             web.color = Color.LightCoral;       
         }
 
@@ -69,15 +68,18 @@ namespace MatrixProjection
 
 
                 if (pos.X > c.pos.X - c.size.X / 2 && pos.X < c.pos.X + c.size.X / 2 &&
-                    pos.Y > 10 + c.pos.Y - c.size.Y / 2 && pos.Y < c.pos.Y + c.size.Y / 2 &&
+                    pos.Y > c.pos.Y - c.size.Y / 2 && pos.Y < c.pos.Y + c.size.Y / 2 &&
                     pos.Z > c.pos.Z - c.size.Z / 2 && pos.Z < c.pos.Z + c.size.Z / 2)
                 {
                     color = Color.Green;
                     vel.Y = 0;
                     onGround = true;
-                    if (pos.Y > c.pos.Y - c.size.Y / 2 && pos.Y < c.pos.Y + c.size.Y / 2)
+                    if (
+                        pos.Y > c.pos.Y - c.size.Y / 2 && pos.Y < c.pos.Y + c.size.Y / 2)
                     {
-                        //pos.Y = c.pos.Y - c.size.Y / 2;
+                        pos.Y = pos.Y = c.pos.Y - c.size.Y / 2 + 1;
+                        vel.Y = 0;
+                        onGround = true;
                     }
 
                     if (pos.X > c.pos.X - c.size.X / 2 && pos.X < c.pos.X + c.size.X / 2)
@@ -130,10 +132,9 @@ namespace MatrixProjection
             //pos.Z = MathHelper.Clamp(pos.Z, 0, 1000);
 
 
-            web.pos = pos - new Vector3(0, size.Y / 2f, 0);       
-            web.size.Y = webLength;
-            web.scale = Matrix.CreateScale(web.size);
-            web.rotation = Matrix.CreateRotationX(MathHelper.ToRadians(90)) * Matrix.CreateRotationY(MathHelper.ToRadians(180)) * MatrixHelper.RotateTowardMatrix(web.pos, anchor);            
+            web.pos = pos - new Vector3(0, size.Y / 2f, 0);
+            web.end = anchor;
+            web.Update(gameTime);
 
             if (!canJump || onGround)
             {
@@ -142,7 +143,7 @@ namespace MatrixProjection
                 rotation = MatrixHelper.RotateTowardMatrix(pos, pos + vel);
             } else
             {
-               // rotation = Matrix.CreateRotationY(0);
+               rotation = Matrix.CreateRotationY(0);
             }
         }
 
@@ -155,11 +156,8 @@ namespace MatrixProjection
             if (Mouse.GetState().LeftButton == ButtonState.Pressed || ks.IsKeyDown(Keys.E))
             {
                 //Draw web
-                //web.Draw(graphicsDevice, camera, effect);
-
+                web.Draw(graphicsDevice, camera, effect);
             }
-            web.Draw(graphicsDevice, camera, effect);
-
 
             base.Draw(graphicsDevice, camera, effect);            
         }       
