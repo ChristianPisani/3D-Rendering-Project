@@ -19,14 +19,14 @@ namespace MatrixProjection
         Keys upKey = Keys.W;
         Keys downKey = Keys.S;
         Keys jumpKey = Keys.Space;
-        bool canJump = true;
-        int jumpFrames = 10;
-        int curJumpFrames = 0;
+        public bool canJump = true;
+        public int jumpFrames = 10;
+        public int curJumpFrames = 0;
         bool jumpPressed = false;
 
-        Vector3 speed = new Vector3(4);
+        Vector3 speed = new Vector3(2);
         float maxVel = 50;
-        float jumpStrength = 10;
+        float jumpStrength = 2;
 
         float webLength = 400;
         Vector3 anchor = new Vector3(600, 0, 0);
@@ -64,39 +64,7 @@ namespace MatrixProjection
                     closestDot = dot;
                     closestCube = c;                    
                     
-                }
-
-
-                if (pos.X > c.pos.X - c.size.X / 2 && pos.X < c.pos.X + c.size.X / 2 &&
-                    pos.Y > c.pos.Y - c.size.Y / 2 && pos.Y < c.pos.Y + c.size.Y / 2 &&
-                    pos.Z > c.pos.Z - c.size.Z / 2 && pos.Z < c.pos.Z + c.size.Z / 2)
-                {
-                    color = Color.Green;
-                    vel.Y = 0;
-                    onGround = true;
-                    if (
-                        pos.Y > c.pos.Y - c.size.Y / 2 && pos.Y < c.pos.Y + c.size.Y / 2)
-                    {
-                        pos.Y = pos.Y = c.pos.Y - c.size.Y / 2 + 1;
-                        vel.Y = 0;
-                        onGround = true;
-                    }
-
-                    if (pos.X > c.pos.X - c.size.X / 2 && pos.X < c.pos.X + c.size.X / 2)
-                    {
-                        pos.X -= vel.X * 2;
-                    }
-
-                    if (pos.Z > c.pos.Z - c.size.Z / 2 && pos.Z < c.pos.Z + c.size.Z / 2)
-                    {
-                        pos.Z -= vel.Z * 2;
-                    }
-                    break;
-                }
-                else
-                {
-                    color = Color.Red;
-                }
+                }                
             }
             closestCube.Selected = true;
             if (!ks.IsKeyDown(Keys.E))

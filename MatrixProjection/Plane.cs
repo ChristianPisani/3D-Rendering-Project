@@ -12,7 +12,8 @@ namespace MatrixProjection
     public class Plane : GameObject
     {
         public int divisions;
-        public Vector3 normal;     
+        public Vector3 normal;
+        public Vector3 originalNormal;
 
         public override Matrix Rotation
         {
@@ -78,6 +79,8 @@ namespace MatrixProjection
                     normal = getVertexNormal(new Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
                                                  new Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
                                                  new Vector3(v.Position.X, v.Position.Y, v.Position.Z));
+                    originalNormal = Vector3.Transform(normal, Matrix.CreateRotationX(MathHelper.ToRadians(90)));
+
                     v.Normal = normal;
                     v1.Normal = normal;
                     v2.Normal = normal;

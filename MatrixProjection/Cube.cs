@@ -25,14 +25,17 @@ namespace MatrixProjection
                 0, 6, 7, //face bottom
 		    	0, 1, 6
             };
-
+        
         public bool inRangeOfPlayer = false;
 
         public bool Selected = false;
 
+        private List<Plane> planes;
+
+
         public Cube(Vector3 pos, Vector3 size) : base(pos, size)
         {
-
+            
         }
 
         public Cube(Vector3 pos, Vector3 size, Vector3 origin) : base(pos, size, origin)
@@ -40,10 +43,46 @@ namespace MatrixProjection
 
         }
 
+        public List<Plane> GetPlanes()
+        {
+            if (planes != null)
+            {
+                return planes;
+            }
+
+            planes = new List<Plane>();
+
+            Plane p = new Plane(pos + new Vector3(size.X / 2, 0, 0), new Vector2(size.Y, size.Z), 1);
+            p.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(90));
+            planes.Add(p);
+
+            p = new Plane(pos - new Vector3(size.X / 2, 0, 0), new Vector2(size.Y, size.Z), 1);
+            p.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(-90));
+            planes.Add(p);
+
+            p = new Plane(pos + new Vector3(0, 0, size.Z / 2), new Vector2(size.X, size.Y), 1);
+            p.Rotation = Matrix.CreateRotationX(MathHelper.ToRadians(-90));
+            planes.Add(p);
+
+            p = new Plane(pos - new Vector3(0, 0, size.Z / 2), new Vector2(size.X, size.Y), 1);
+            p.Rotation = Matrix.CreateRotationX(MathHelper.ToRadians(90));
+            planes.Add(p);
+
+            p = new Plane(pos + new Vector3(0, size.Y / 2, 0), new Vector2(size.Z, size.X), 1);
+            p.Rotation = Matrix.CreateRotationY(MathHelper.ToRadians(90)) * Matrix.CreateRotationZ(MathHelper.ToRadians(180));
+            planes.Add(p);
+
+            p = new Plane(pos - new Vector3(0, size.Y / 2, 0), new Vector2(size.Z, size.X), 1);
+            p.Rotation = Matrix.CreateRotationY(MathHelper.ToRadians(90));
+            planes.Add(p);
+
+            return planes;
+        }
+
         public void Update(double gameTime, Vector3 playerpos)
         {
             inRangeOfPlayer = false;
-            color = Color.Gray;
+            //color = Color.Gray;
             if(Vector2.Distance(new Vector2(pos.X, pos.Z), new Vector2(playerpos.X, playerpos.Z)) < 20000)
             {
                 //color = Color.Red;
@@ -51,7 +90,7 @@ namespace MatrixProjection
             }
             if(Selected)
             {
-                color = Color.Green;
+                //color = Color.Green;
             }
             Selected = false;
 

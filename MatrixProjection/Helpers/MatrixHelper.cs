@@ -135,6 +135,11 @@ namespace MatrixProjection.Helpers
             Vector3 xaxis = Vector3.Normalize(Vector3.Cross(objectUpVector, zaxis));
             Vector3 yaxis = Vector3.Cross(zaxis, xaxis);
 
+            if(yaxis == Vector3.Zero)
+            {
+                return Matrix.CreateRotationY(0);
+            }
+
             Matrix pm = new Matrix(
                 new Vector4(xaxis.X, xaxis.Y, xaxis.Z, 0),
                 new Vector4(yaxis.X, yaxis.Y, yaxis.Z, 0),

@@ -50,6 +50,8 @@ namespace MatrixProjection
 
         Effect effect;
 
+        Line l;
+
 
         RasterizerState rasterizerState = new RasterizerState();
 
@@ -95,7 +97,7 @@ namespace MatrixProjection
             float radius = 300;
             float step = (float)(Math.PI * 2) / numBoxes;
 
-           // gameObjects.Add(new Cube(new Vector3(0, 25, 1000), new Vector3(50)));
+            // gameObjects.Add(new Cube(new Vector3(0, 25, 1000), new Vector3(50)));
 
             for (float x = 0; x < Math.PI * 2; x += step)
             {
@@ -137,47 +139,89 @@ namespace MatrixProjection
             player.color = Color.Red;
             gameObjects.Add(player);
 
+            l = new Line(player.pos, player.pos, 2);
 
-            Plane plane = new Plane(new Vector3(100, 100, 100), new Vector2(1000, 1000), 1);
-            plane.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(90));
-            gameObjects.Add(plane);
-            Line line = new Line(new Vector3(260, 0, 60), new Vector3(50, 100, 50), 5);            
-            gameObjects.Add(line);
 
-            Cube kube = new Cube(IntersectionChecks.LinePlane(line, plane), new Vector3(10));
-            
-            gameObjects.Add(kube);
+            Plane newPlane = new Plane(new Vector3(100, 100, 100), new Vector2(1000, 1000), 4);
+            newPlane.color = Color.DarkKhaki;
+            newPlane.Rotation = Matrix.CreateRotationX(MathHelper.ToRadians(65));
 
-            //CreateCity();
+            Vector3 transformedNormal; //Vector3.TransformNormal(newPlane.normal, Matrix.CreateRotationY(MathHelper.ToRadians(90)) * Matrix.CreateRotationX(MathHelper.ToRadians(90)));
+            transformedNormal = Vector3.Cross(newPlane.normal, new Vector3(0, -1, 0));
+            transformedNormal.Normalize();
+            Line planeNormal = new Line(newPlane.pos, newPlane.pos + transformedNormal * 200, 5);
+
+            gameObjects.Add(planeNormal);
+
+            Line newLine = new Line(new Vector3(100, -1000, 0), new Vector3(100, 100, 200), 3);
+            gameObjects.Add(newLine);
+
+            Cube newCube2 = new Cube(new Vector3(-700, 0, 801), new Vector3(20));
+            newCube2.pos = newPlane.pos + transformedNormal * 501;
+            Vector3 place = new Vector3(1, newPlane.size.Z / 2, 1);
+            Vector3 planePos = newPlane.pos + transformedNormal * (newPlane.size.X / 2);
+
+            Cube kk = new Cube(planePos, new Vector3(10));
+            kk.color = Color.Magenta;
+            gameObjects.Add(kk);
+
+            if (Vector3.Dot(newCube2.pos - planePos, transformedNormal) > 0 ||
+                Vector3.Dot(newCube2.pos - planePos, transformedNormal) > 0)
+            {
+                newCube2.color = Color.Red;
+            }
+            else
+            {
+                newCube2.color = Color.Green;
+            }
+
+            gameObjects.Add(newCube2);
+
+            try
+            {
+                Cube newCube = new Cube((Vector3)IntersectionChecks.LinePlane(newLine, newPlane), new Vector3(10));
+                gameObjects.Add(newCube);
+            }
+            catch (Exception e) { }
+
+            gameObjects.Add(newPlane);
+            CreateCity();
 
             base.Initialize();
         }
 
         public void CreateCity()
         {
-            for(int x = 0; x < 10; x++)
+            for (int x = 0; x < 1; x++)
             {
-                for(int y = 0; y < 10; y++)
+                for (int y = 0; y < 10; y++)
                 {
                     int size = 30000;
-                    Cube c = new Cube(new Vector3(x * size, 0, y * size), new Vector3(size, 1, size), new Vector3(0, 0.5f, 0));
+                    Cube c = new Cube(new Vector3(x * size, 0, y * size), new Vector3(size, 1, size));
 
-                    gameObjects.Add(c);
+                    //gameObjects.Add(c);
 
 
                     var rnd = new Random();
 
                     int divisions = 10;
                     int buildingSize = size / divisions;
-                    for(int xx = 0; xx < divisions; xx++)
+                    for (int xx = 0; xx < divisions; xx++)
                     {
-                        for(int yy = 0; yy < divisions; yy++)
+                        for (int yy = 0; yy < divisions; yy++)
                         {
-                            if(rnd.Next(0, 10) == 1)
+                            if (rnd.Next(0, 10) == 1)
                             {
                                 var buildingHeight = rnd.Next(5000, 10000);
-                                c = new Cube(new Vector3(x * size + xx * buildingSize, -buildingHeight/2, y * size + yy * buildingSize), new Vector3(buildingSize, buildingHeight, buildingSize));
+                                c = new Cube(new Vector3(x * size + xx * buildingSize, -buildingHeight / 2, y * size + yy * buildingSize), new Vector3(buildingSize, buildingHeight, buildingSize));
                                 gameObjects.Add(c);
+
+                                foreach (Plane p in c.GetPlanes())
+                                {
+                                    Line l = new Line(p.pos, p.pos + p.normal * 500, 10);
+
+                                    //gameObjects.Add(p);
+                                }
                             }
                         }
                     }
@@ -200,10 +244,10 @@ namespace MatrixProjection
             //effect.CurrentTechnique = effect.Techniques["DepthMap"];            
             effect.Parameters["Projection"].SetValue(camera.projectionMatrix);
             //effect.Parameters["Color"].SetValue(Color.SeaShell.ToVector4());
-            effect.Parameters["LightPos"].SetValue(new Vector3(4000, 4000, 4000));
-            effect.Parameters["LightPower"].SetValue(0.5f);
+            effect.Parameters["LightPos"].SetValue(new Vector3(4000, 4000, -4000));
+            effect.Parameters["LightPower"].SetValue(0.8f);
             effect.Parameters["LightColor"].SetValue(new Vector4(0.6f, 0.6f, .6f, 1));
-            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(.4f, .4f, .4f, 1f));
+            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(.8f, .8f, .8f, 1f));
             //effect.AmbientLightColor = new Vector3(.7f, .2f, .4f);
             //effect.Texture = pixel;
             //effect.EmissiveColor = new Vector3(1, 0, 0);
@@ -222,6 +266,7 @@ namespace MatrixProjection
 
         }
 
+        Vector3? intersection = null;
         protected override void Update(GameTime gameTime)
         {
             gameWindow = Window;
@@ -284,6 +329,8 @@ namespace MatrixProjection
                 flock.Update();
             }
 
+            List<Cube> cubesInRange = gameObjects.Where(m => m is Cube && (m as Cube).inRangeOfPlayer).Cast<Cube>().ToList();
+
             foreach (GameObject gameObject in gameObjects)
             {
                 if (gameObject is Cube cube && !(gameObject is Line))
@@ -295,18 +342,77 @@ namespace MatrixProjection
                     //cube.pos.Y += (float)Math.Sin(angle + (yPos/150)) * 10;                    
 
                     cube.Update(gameTime.TotalGameTime.TotalMilliseconds, player.pos);
-                } else if(gameObject is Player p)
+                }
+                else if (gameObject is Player p)
                 {
-                    p.Update(gameTime.TotalGameTime.TotalMilliseconds, gameObjects.Where(m => m is Cube && (m as Cube).inRangeOfPlayer).Cast<Cube>().ToList());
-                } else
+                    p.Update(gameTime.TotalGameTime.TotalMilliseconds, cubesInRange);
+                }
+                else
                 {
                     gameObject.Update(gameTime.TotalGameTime.TotalMilliseconds);
 
                 }
             }
 
+            l.pos = player.oldPos;
+            l.end = player.pos;
+
+            if ((l.end - l.pos).Length() < 10)
+            {
+                l.end += player.vel;
+            }
+
+            l.Update(gameTime.TotalGameTime.TotalMilliseconds);
+
+
+            List<Cube> cubesInRangeCircle = gameObjects.Where(m => m is Cube && Vector2.Distance(new Vector2(m.pos.X, m.pos.Z), new Vector2(player.pos.X, player.pos.Z)) < 2000).Cast<Cube>().ToList();
+
+            foreach (Cube c in cubesInRange)
+            {
+                bool collided = false;
+
+                foreach (Plane plane in c.GetPlanes())
+                {
+                    intersection = IntersectionChecks.LinePlane(l, plane) ?? null;
+                    if (intersection != null)
+                    {
+                        Cylinder cyl = new Cylinder((Vector3)intersection, new Vector3(10, 10, 10), 10);
+                        cyl.color = Color.Magenta;
+                        //gameObjects.Add(cyl);
+                        Vector3 oldPlayerPos = player.oldPos;
+
+                        Vector3 newPos = (Vector3)intersection - plane.normal * 3;
+                                                
+                        player.pos = newPos;
+                        
+                        //player.pos.Y = intersection.Value.Y;
+
+
+                        //player.vel = oldPlayerPos - player.pos;
+                        Vector3 undesiredMotion = plane.normal * (Vector3.Dot(player.vel, plane.normal));
+                        Vector3 desiredMotion = (player.vel - undesiredMotion) * 0.9f;
+                        player.vel = desiredMotion;
+
+                        collided = true;
+                        break;
+
+                        //player.vel = Vector3.Reflect(player.vel, plane.normal) * 0.1f;
+                    }
+                }
+
+                if (collided)
+                {
+                    break;
+                }
+
+            }
+
+
+
             base.Update(gameTime);
         }
+
+
 
         protected override void Draw(GameTime gameTime)
         {
@@ -320,13 +426,15 @@ namespace MatrixProjection
             {
                 gameObject.Draw(graphics.GraphicsDevice, camera, effect);
             }
+            l.Draw(graphics.GraphicsDevice, camera, effect);
+
 
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, rasterizerState);
 
             double angle = Math.Atan2((0 - player.pos.Z), (0 - player.pos.X) - Game1.camera.angle.X);
 
-            spriteBatch.DrawString(gameFont, (Vector3.Dot(Vector3.Normalize(camera.lookAt), Vector3.Normalize(Vector3.One))).ToString(), new Vector2(30, 30), Color.White);
+            spriteBatch.DrawString(gameFont, player.pos.ToString(), new Vector2(30, 30), Color.White);
 
             spriteBatch.End();
 
