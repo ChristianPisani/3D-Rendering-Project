@@ -53,27 +53,27 @@ namespace MatrixProjection
             planes = new List<Plane>();
 
             Plane p = new Plane(pos + new Vector3(size.X / 2, 0, 0), new Vector2(size.Y, size.Z), 1);
-            p.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(90));
+            p.Rotation = Rotation * Matrix.CreateRotationZ(MathHelper.ToRadians(90));
             planes.Add(p);
 
             p = new Plane(pos - new Vector3(size.X / 2, 0, 0), new Vector2(size.Y, size.Z), 1);
-            p.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(-90));
+            p.Rotation = Rotation * Matrix.CreateRotationZ(MathHelper.ToRadians(-90));
             planes.Add(p);
 
             p = new Plane(pos + new Vector3(0, 0, size.Z / 2), new Vector2(size.X, size.Y), 1);
-            p.Rotation = Matrix.CreateRotationX(MathHelper.ToRadians(-90));
+            p.Rotation = Rotation * Matrix.CreateRotationX(MathHelper.ToRadians(-90));
             planes.Add(p);
 
             p = new Plane(pos - new Vector3(0, 0, size.Z / 2), new Vector2(size.X, size.Y), 1);
-            p.Rotation = Matrix.CreateRotationX(MathHelper.ToRadians(90));
+            p.Rotation = Rotation * Matrix.CreateRotationX(MathHelper.ToRadians(90));
             planes.Add(p);
 
             p = new Plane(pos + new Vector3(0, size.Y / 2, 0), new Vector2(size.Z, size.X), 1);
-            p.Rotation = Matrix.CreateRotationY(MathHelper.ToRadians(90)) * Matrix.CreateRotationZ(MathHelper.ToRadians(180));
+            p.Rotation = Rotation * Matrix.CreateRotationY(MathHelper.ToRadians(90)) * Matrix.CreateRotationZ(MathHelper.ToRadians(180));
             planes.Add(p);
 
             p = new Plane(pos - new Vector3(0, size.Y / 2, 0), new Vector2(size.Z, size.X), 1);
-            p.Rotation = Matrix.CreateRotationY(MathHelper.ToRadians(90));
+            p.Rotation = Rotation * Matrix.CreateRotationY(MathHelper.ToRadians(90));
             planes.Add(p);
 
             return planes;

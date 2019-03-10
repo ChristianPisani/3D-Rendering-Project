@@ -27,13 +27,17 @@ namespace MatrixProjection
             var prod3 = prod1 / prod2;
             intersection = line.pos - lineVector * prod3;
 
-            Vector3 transformedNormal = Vector3.Cross(plane.normal, new Vector3(0, -1, 0));
+            Vector3 transformedNormal = plane.Rotation.Right;
+            if (transformedNormal == Vector3.Zero) transformedNormal = new Vector3(1, 0, 0);
+
             transformedNormal.Normalize();
 
             Vector3 planePos = plane.pos + transformedNormal * (plane.size.X / 2);
             Vector3 planePos2 = plane.pos - transformedNormal * (plane.size.X / 2);
 
-            Vector3 transformedNormal2 = Vector3.Cross(plane.normal, new Vector3(-1, 0, 0));
+            Vector3 transformedNormal2 = plane.Rotation.Forward;
+            //if (transformedNormal2 == Vector3.Zero) transformedNormal2 = new Vector3(0, 0, 1);
+
             transformedNormal2.Normalize();
             Vector3 planePos3 = plane.pos + transformedNormal2 * (plane.size.Z / 2);
             Vector3 planePos4 = plane.pos - transformedNormal2 * (plane.size.Z / 2);

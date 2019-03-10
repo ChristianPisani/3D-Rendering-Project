@@ -144,10 +144,13 @@ namespace MatrixProjection
 
             Plane newPlane = new Plane(new Vector3(100, 100, 100), new Vector2(1000, 1000), 4);
             newPlane.color = Color.DarkKhaki;
-            newPlane.Rotation = Matrix.CreateRotationX(MathHelper.ToRadians(65));
+            newPlane.Rotation = Matrix.CreateRotationY(MathHelper.ToRadians(45)) * Matrix.CreateRotationZ(MathHelper.ToRadians(90));
 
             Vector3 transformedNormal; //Vector3.TransformNormal(newPlane.normal, Matrix.CreateRotationY(MathHelper.ToRadians(90)) * Matrix.CreateRotationX(MathHelper.ToRadians(90)));
-            transformedNormal = Vector3.Cross(newPlane.normal, new Vector3(0, -1, 0));
+                                       //transformedNormal = Vector3.Cross(newPlane.normal, new Vector3(0, -1, 0));
+            transformedNormal = newPlane.Rotation.Right;
+            transformedNormal.Normalize();
+            if (transformedNormal == Vector3.Zero) transformedNormal = new Vector3(1, 0, 0);
             transformedNormal.Normalize();
             Line planeNormal = new Line(newPlane.pos, newPlane.pos + transformedNormal * 200, 5);
 
@@ -176,7 +179,8 @@ namespace MatrixProjection
                 newCube2.color = Color.Green;
             }
 
-            Vector3 transformedNormal2 = Vector3.Cross(newPlane.normal, new Vector3(-1, 0, 0));
+            Vector3 transformedNormal2 = Vector3.Cross(newPlane.normal, new Vector3(-1, 0, -1));
+            transformedNormal2 = newPlane.Rotation.Forward;
             transformedNormal2.Normalize();
             Vector3 planePos3 = newPlane.pos + transformedNormal2 * (newPlane.size.Z / 2);
             Vector3 planePos4 = newPlane.pos - transformedNormal2 * (newPlane.size.Z / 2);
@@ -209,7 +213,7 @@ namespace MatrixProjection
                         newKube.color = Color.Green;
                     }
 
-                    //gameObjects.Add(newKube);
+                    gameObjects.Add(newKube);
 
                 }
             }
@@ -234,6 +238,9 @@ namespace MatrixProjection
             catch (Exception e) { }
 
             gameObjects.Add(newPlane);
+
+            
+
             CreateCity();
 
             base.Initialize();
@@ -263,6 +270,8 @@ namespace MatrixProjection
                             {
                                 var buildingHeight = rnd.Next(5000, 10000);
                                 c = new Cube(new Vector3(x * size + xx * buildingSize, -buildingHeight / 2, y * size + yy * buildingSize), new Vector3(buildingSize, buildingHeight, buildingSize));
+                                //c.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(10));
+                                
                                 gameObjects.Add(c);
 
                                 foreach (Plane p in c.GetPlanes())
