@@ -160,17 +160,66 @@ namespace MatrixProjection
             newCube2.pos = newPlane.pos + transformedNormal * 501;
             Vector3 place = new Vector3(1, newPlane.size.Z / 2, 1);
             Vector3 planePos = newPlane.pos + transformedNormal * (newPlane.size.X / 2);
+            Vector3 planePos2 = newPlane.pos - transformedNormal * (newPlane.size.X / 2);
 
             Cube kk = new Cube(planePos, new Vector3(10));
             kk.color = Color.Magenta;
             gameObjects.Add(kk);
 
             if (Vector3.Dot(newCube2.pos - planePos, transformedNormal) > 0 ||
-                Vector3.Dot(newCube2.pos - planePos, transformedNormal) > 0)
+                Vector3.Dot(newCube2.pos - planePos2, -transformedNormal) > 0)
             {
                 newCube2.color = Color.Red;
             }
             else
+            {
+                newCube2.color = Color.Green;
+            }
+
+            Vector3 transformedNormal2 = Vector3.Cross(newPlane.normal, new Vector3(-1, 0, 0));
+            transformedNormal2.Normalize();
+            Vector3 planePos3 = newPlane.pos + transformedNormal2 * (newPlane.size.Z / 2);
+            Vector3 planePos4 = newPlane.pos - transformedNormal2 * (newPlane.size.Z / 2);
+
+
+            for (int x = 0; x < 20; x++)
+            {
+                for(int y = 0; y < 20; y++)
+                {
+                    Cube newKube = new Cube((-transformedNormal * 1000) + (-transformedNormal2 * 1000) + newPlane.pos + (transformedNormal * 100 * x) + (transformedNormal2 * 100 * y), new Vector3(20));
+
+                    if (Vector3.Dot(newKube.pos - planePos, transformedNormal) > 0 ||
+                        Vector3.Dot(newKube.pos - planePos2, -transformedNormal) > 0)
+                    {
+                        newKube.color = Color.Red;
+                    }
+                    else
+                    {
+                        newKube.color = Color.Green;
+                    }
+
+
+                    if (Vector3.Dot(newKube.pos - planePos3, transformedNormal2) > 0 ||
+                        Vector3.Dot(newKube.pos - planePos4, -transformedNormal2) > 0)
+                    {
+                        newKube.color = Color.Red;
+                    }
+                    else if (newKube.color != Color.Red)
+                    {
+                        newKube.color = Color.Green;
+                    }
+
+                    //gameObjects.Add(newKube);
+
+                }
+            }
+
+            if (Vector3.Dot(newCube2.pos - planePos, transformedNormal2) > 0 ||
+                Vector3.Dot(newCube2.pos - planePos, transformedNormal2) > 0)
+            {
+                newCube2.color = Color.Red;
+            }
+            else if(newCube2.color != Color.Red)            
             {
                 newCube2.color = Color.Green;
             }
@@ -381,7 +430,7 @@ namespace MatrixProjection
                         //gameObjects.Add(cyl);
                         Vector3 oldPlayerPos = player.oldPos;
 
-                        Vector3 newPos = (Vector3)intersection - plane.normal * 3;
+                        Vector3 newPos = (Vector3)intersection - plane.normal;
                                                 
                         player.pos = newPos;
                         

@@ -19,7 +19,7 @@ namespace MatrixProjection
             var prod1 = Vector3.Dot(diff, plane.normal);
             var prod2 = Vector3.Dot(lineVector, plane.normal);
 
-            if(prod2 == 0)
+            if (prod2 == 0)
             {
                 return null;
             }
@@ -27,24 +27,33 @@ namespace MatrixProjection
             var prod3 = prod1 / prod2;
             intersection = line.pos - lineVector * prod3;
 
-
             Vector3 transformedNormal = Vector3.Cross(plane.normal, new Vector3(0, -1, 0));
             transformedNormal.Normalize();
-            Vector3 offset = plane.pos + transformedNormal * (plane.size.X / 2);
-            if (Vector3.Dot(intersection - plane.pos - offset, transformedNormal) > 0 ||
-                Vector3.Dot(intersection - plane.pos + offset, -transformedNormal) > 0)
+
+            Vector3 planePos = plane.pos + transformedNormal * (plane.size.X / 2);
+            Vector3 planePos2 = plane.pos - transformedNormal * (plane.size.X / 2);
+
+            Vector3 transformedNormal2 = Vector3.Cross(plane.normal, new Vector3(-1, 0, 0));
+            transformedNormal2.Normalize();
+            Vector3 planePos3 = plane.pos + transformedNormal2 * (plane.size.Z / 2);
+            Vector3 planePos4 = plane.pos - transformedNormal2 * (plane.size.Z / 2);
+
+            
+            if (Vector3.Dot(intersection - planePos, transformedNormal) > 0 ||
+                Vector3.Dot(intersection - planePos2, -transformedNormal) > 0)
             {
                 return null;
             }
 
-            transformedNormal = Vector3.Cross(plane.normal, new Vector3(-1, 0, 0));
-            transformedNormal.Normalize();
-            offset = plane.pos + transformedNormal * (plane.size.Z / 2); ;
-            if (Vector3.Dot(intersection - plane.pos + offset, transformedNormal) > 0 ||
-                Vector3.Dot(intersection - plane.pos - offset, transformedNormal) > 0)
+
+            if (Vector3.Dot(intersection - planePos3, transformedNormal2) > 0 ||
+                Vector3.Dot(intersection - planePos4, -transformedNormal2) > 0)
             {
                 return null;
             }
+
+
+
 
             if ((line.pos - intersection).Length() > lineVector.Length() ||
                 (line.end - intersection).Length() > lineVector.Length())
@@ -52,7 +61,7 @@ namespace MatrixProjection
                 return null;
             }
 
-            if(float.IsNegativeInfinity(intersection.X))
+            if (float.IsNegativeInfinity(intersection.X))
             {
                 return null;
             }
