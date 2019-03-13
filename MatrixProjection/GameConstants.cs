@@ -9,7 +9,7 @@ namespace MatrixProjection
 {
     public static class GameConstants
     {
-        public static readonly float gravity = 0.98f;
+        public static readonly float gravity = 1f;
 
         public static Vector3 SpringForce(Vector3 anchor, Vector3 pos, Vector3 vel, float Length)
         {

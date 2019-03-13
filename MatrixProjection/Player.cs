@@ -82,8 +82,6 @@ namespace MatrixProjection
             {
                 canJump = true;
                 curJumpFrames = 0;
-                vel.X = MathHelper.Lerp(vel.X, 0, 0.2f);
-                vel.Z = MathHelper.Lerp(vel.Z, 0, 0.2f);
             }
             else
             {
@@ -108,10 +106,10 @@ namespace MatrixProjection
             {
                 var v = Vector3.One;
                 if (vel.X != 0 || vel.Z != 0) v = vel;
-                rotation = MatrixHelper.RotateTowardMatrix(pos, pos + vel);
+                //rotation = MatrixHelper.RotateTowardMatrix(pos, pos + vel);
             } else
             {
-               rotation = Matrix.CreateRotationY(0);
+               //rotation = Matrix.CreateRotationY(0);
             }
         }
 

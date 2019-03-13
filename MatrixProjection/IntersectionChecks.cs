@@ -15,6 +15,11 @@ namespace MatrixProjection
 
             Vector3 lineVector = line.end - line.pos;
 
+            if (Vector3.Cross(lineVector, plane.normal) == Vector3.Zero)
+            {
+                return line.end;
+            }
+
             Vector3 diff = line.pos - plane.pos;
             var prod1 = Vector3.Dot(diff, plane.normal);
             var prod2 = Vector3.Dot(lineVector, plane.normal);
@@ -28,7 +33,7 @@ namespace MatrixProjection
             intersection = line.pos - lineVector * prod3;
 
             Vector3 transformedNormal = plane.Rotation.Right;
-            if (transformedNormal == Vector3.Zero) transformedNormal = new Vector3(1, 0, 0);
+            //if (transformedNormal == Vector3.Zero) transformedNormal = new Vector3(1, 0, 0);
 
             transformedNormal.Normalize();
 

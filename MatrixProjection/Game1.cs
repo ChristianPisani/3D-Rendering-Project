@@ -134,7 +134,7 @@ namespace MatrixProjection
             }
 
 
-            player = new Player(new Vector3(0, -40, 0), new Vector3(20, 40, 20), 1);
+            player = new Player(new Vector3(0, -400, 0), new Vector3(20, 40, 20), 1);
             player.SetOrigin(new Vector3(0, -.5f, 0));
             player.color = Color.Red;
             gameObjects.Add(player);
@@ -188,7 +188,7 @@ namespace MatrixProjection
 
             for (int x = 0; x < 20; x++)
             {
-                for(int y = 0; y < 20; y++)
+                for (int y = 0; y < 20; y++)
                 {
                     Cube newKube = new Cube((-transformedNormal * 1000) + (-transformedNormal2 * 1000) + newPlane.pos + (transformedNormal * 100 * x) + (transformedNormal2 * 100 * y), new Vector3(20));
 
@@ -223,7 +223,7 @@ namespace MatrixProjection
             {
                 newCube2.color = Color.Red;
             }
-            else if(newCube2.color != Color.Red)            
+            else if (newCube2.color != Color.Red)
             {
                 newCube2.color = Color.Green;
             }
@@ -239,7 +239,7 @@ namespace MatrixProjection
 
             gameObjects.Add(newPlane);
 
-            
+
 
             CreateCity();
 
@@ -255,7 +255,7 @@ namespace MatrixProjection
                     int size = 30000;
                     Cube c = new Cube(new Vector3(x * size, 0, y * size), new Vector3(size, 1, size));
 
-                    //gameObjects.Add(c);
+                    gameObjects.Add(c);
 
 
                     var rnd = new Random();
@@ -271,14 +271,14 @@ namespace MatrixProjection
                                 var buildingHeight = rnd.Next(5000, 10000);
                                 c = new Cube(new Vector3(x * size + xx * buildingSize, -buildingHeight / 2, y * size + yy * buildingSize), new Vector3(buildingSize, buildingHeight, buildingSize));
                                 //c.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(10));
-                                
+
                                 gameObjects.Add(c);
 
                                 foreach (Plane p in c.GetPlanes())
                                 {
                                     Line l = new Line(p.pos, p.pos + p.normal * 500, 10);
 
-                                    //gameObjects.Add(p);
+                                    gameObjects.Add(p);
                                 }
                             }
                         }
@@ -425,6 +425,7 @@ namespace MatrixProjection
 
             List<Cube> cubesInRangeCircle = gameObjects.Where(m => m is Cube && Vector2.Distance(new Vector2(m.pos.X, m.pos.Z), new Vector2(player.pos.X, player.pos.Z)) < 2000).Cast<Cube>().ToList();
 
+            player.onGround = false;
             foreach (Cube c in cubesInRange)
             {
                 bool collided = false;
@@ -440,16 +441,24 @@ namespace MatrixProjection
                         Vector3 oldPlayerPos = player.oldPos;
 
                         Vector3 newPos = (Vector3)intersection - plane.normal;
-                                                
-                        player.pos = newPos;
+
                         
+                            player.pos = newPos;
+
                         //player.pos.Y = intersection.Value.Y;
+
+
+
+                        if(plane.normal.Y < 0)
+                        player.onGround = true;
 
 
                         //player.vel = oldPlayerPos - player.pos;
                         Vector3 undesiredMotion = plane.normal * (Vector3.Dot(player.vel, plane.normal));
-                        Vector3 desiredMotion = (player.vel - undesiredMotion) * 0.9f;
+                        Vector3 desiredMotion = ((player.vel * new Vector3(0.9f, 1, 0.9f)) - undesiredMotion);
                         player.vel = desiredMotion;
+
+                       
 
                         collided = true;
                         break;
@@ -492,7 +501,7 @@ namespace MatrixProjection
 
             double angle = Math.Atan2((0 - player.pos.Z), (0 - player.pos.X) - Game1.camera.angle.X);
 
-            spriteBatch.DrawString(gameFont, player.pos.ToString(), new Vector2(30, 30), Color.White);
+            spriteBatch.DrawString(gameFont, (player.pos - l.pos).ToString() + " : " + (player.pos - l.end).ToString(), new Vector2(30, 30), Color.White);
 
             spriteBatch.End();
 
