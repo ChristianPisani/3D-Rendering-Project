@@ -20,13 +20,13 @@ namespace MatrixProjection
         Keys downKey = Keys.S;
         Keys jumpKey = Keys.Space;
         public bool canJump = true;
-        public int jumpFrames = 10;
+        public int jumpFrames = 20;
         public int curJumpFrames = 0;
-        bool jumpPressed = false;
+        public bool jumpPressed = false;
 
         Vector3 speed = new Vector3(2);
         float maxVel = 50;
-        float jumpStrength = 2;
+        float jumpStrength = 4;
 
         float webLength = 400;
         Vector3 anchor = new Vector3(600, 0, 0);
@@ -49,6 +49,8 @@ namespace MatrixProjection
         public void Update(double gameTime, List<Cube> colObjects)
         {
             base.Update(gameTime);
+
+            if (canJump) vel.Y = 0;
 
             float closestDist = float.MaxValue;
             float closestDot = 100000000000000000;
@@ -102,14 +104,19 @@ namespace MatrixProjection
             web.end = anchor;
             web.Update(gameTime);
 
-            if (!canJump || onGround)
+            if (!canJump)
             {
-                var v = Vector3.One;
-                if (vel.X != 0 || vel.Z != 0) v = vel;
-                //rotation = MatrixHelper.RotateTowardMatrix(pos, pos + vel);
+                if (vel.X != 0 && vel.Z != 0 && vel.Y != 0)
+                {
+
+                    rotation = MatrixHelper.RotateTowardMatrix(pos, pos + vel);
+                } else
+                {
+                    rotation = Matrix.CreateRotationY(angle.X);
+                }
             } else
             {
-               //rotation = Matrix.CreateRotationY(0);
+               rotation = Matrix.CreateRotationY(angle.X);                
             }
         }
 

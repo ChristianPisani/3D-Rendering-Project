@@ -445,20 +445,27 @@ namespace MatrixProjection
                         
                             player.pos = newPos;
 
+                        player.canJump = true;
+                        player.curJumpFrames = 0;
+
                         //player.pos.Y = intersection.Value.Y;
 
 
-
-                        if(plane.normal.Y < 0)
-                        player.onGround = true;
-
-
                         //player.vel = oldPlayerPos - player.pos;
+                        var storedVelY = player.vel.Y;
+
                         Vector3 undesiredMotion = plane.normal * (Vector3.Dot(player.vel, plane.normal));
-                        Vector3 desiredMotion = ((player.vel * new Vector3(0.9f, 1, 0.9f)) - undesiredMotion);
+                        Vector3 desiredMotion = ((player.vel) - (undesiredMotion)) * 0.9f;
+
+
                         player.vel = desiredMotion;
 
-                       
+                        if(player.jumpPressed)
+                        {
+                            player.vel.Y = storedVelY;
+                        }
+                        player.vel.Y = Math.Min(0, player.vel.Y);
+
 
                         collided = true;
                         break;
@@ -501,7 +508,7 @@ namespace MatrixProjection
 
             double angle = Math.Atan2((0 - player.pos.Z), (0 - player.pos.X) - Game1.camera.angle.X);
 
-            spriteBatch.DrawString(gameFont, (player.pos - l.pos).ToString() + " : " + (player.pos - l.end).ToString(), new Vector2(30, 30), Color.White);
+            spriteBatch.DrawString(gameFont, (player.vel.Y).ToString(), new Vector2(30, 30), Color.White);
 
             spriteBatch.End();
 
