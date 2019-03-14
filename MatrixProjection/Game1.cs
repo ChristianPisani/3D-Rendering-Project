@@ -440,7 +440,7 @@ namespace MatrixProjection
                         //gameObjects.Add(cyl);
                         Vector3 oldPlayerPos = player.oldPos;
 
-                        Vector3 newPos = (Vector3)intersection - plane.normal;
+                        Vector3 newPos = (Vector3)intersection - plane.normal * new Vector3(2, GameConstants.gravity, 2);
 
                         
                             player.pos = newPos;
@@ -455,7 +455,7 @@ namespace MatrixProjection
                         var storedVelY = player.vel.Y;
 
                         Vector3 undesiredMotion = plane.normal * (Vector3.Dot(player.vel, plane.normal));
-                        Vector3 desiredMotion = ((player.vel) - (undesiredMotion)) * 0.9f;
+                        Vector3 desiredMotion = ((player.vel) - (undesiredMotion)) * 0.95f;
 
 
                         player.vel = desiredMotion;

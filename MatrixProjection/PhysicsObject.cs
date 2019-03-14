@@ -10,8 +10,8 @@ namespace MatrixProjection
     public class PhysicsObject : GameObject
     {
         public Vector3 oldPos;
-        public Vector3 vel;
-        public Vector3 acl;
+        public Vector3 vel, prevVel;
+        public Vector3 acl, prevAcl;
         public float mass;
         public bool onGround = false;
 
@@ -41,11 +41,13 @@ namespace MatrixProjection
                 ApplyForce(new Vector3(0, GameConstants.gravity, 0));
             }
 
+            prevVel = vel;
             vel += acl;
             pos += vel;
 
             onGround = false;
 
+            prevAcl = acl;
             this.acl = Vector3.Zero;
 
             base.Update(gameTime);

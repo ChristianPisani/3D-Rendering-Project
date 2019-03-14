@@ -72,7 +72,26 @@ namespace MatrixProjection
             if (!ks.IsKeyDown(Keys.E))
             {
                 //anchor = new Vector3(pos.X + forwardVector.X * 400, pos.Y - 400, pos.Z + forwardVector.Z * 400);
-                anchor = closestCube.pos - new Vector3(0, closestCube.size.Y/2, 0);
+
+                var planes = closestCube.GetPlanes();
+                Vector3? intersection = new Vector3();
+                float longestDistance = float.PositiveInfinity;
+                Line l = new Line(pos, closestCube.pos - new Vector3(0, closestCube.size.Y / 2, 0), 1);
+
+                foreach (Plane p in planes)
+                {
+                    intersection = IntersectionChecks.LinePlane(l, p);
+                    if (intersection != null)
+                    {
+                        var dist = Vector3.Distance((Vector3)intersection, pos);
+                        if (dist < longestDistance)
+                        {
+                            //anchor = closestCube.pos - new Vector3(0, closestCube.size.Y / 2, 0);
+                            anchor = (Vector3)intersection;
+                            longestDistance = dist;
+                        }
+                    }
+                }
             }
 
             HandleInput();            
