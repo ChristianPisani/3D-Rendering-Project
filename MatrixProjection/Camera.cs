@@ -25,7 +25,7 @@ namespace MatrixProjection
 
         public float FOV = Microsoft.Xna.Framework.MathHelper.PiOver4;
         public float nearClipPlane = 1;
-        public float farClipPlane = 50000;
+        public float farClipPlane = 5000000;
 
         const float camSpeed = 0.04f;
         const float camMoveSpeed = 10;

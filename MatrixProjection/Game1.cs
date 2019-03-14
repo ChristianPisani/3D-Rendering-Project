@@ -68,6 +68,32 @@ namespace MatrixProjection
             Content.RootDirectory = "Content";
         }
 
+        protected override void LoadContent()
+        {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            pixel = Content.Load<Texture2D>("Pixel");
+            gameFont = Content.Load<SpriteFont>("font1");
+            vertexShader = Content.Load<Effect>("vertexShader");
+            pixelShader = Content.Load<Effect>("pixelShader");
+            effect = vertexShader;
+
+            //effect = new BasicEffect(graphics.GraphicsDevice);
+            effect.CurrentTechnique = effect.Techniques["BasicColorDrawing"];
+            //effect.CurrentTechnique = effect.Techniques["DepthMap"];            
+            effect.Parameters["Projection"].SetValue(camera.projectionMatrix);
+            //effect.Parameters["Color"].SetValue(Color.SeaShell.ToVector4());
+            effect.Parameters["LightPos"].SetValue(new Vector3(100000, 50000, 100000));
+            effect.Parameters["LightPower"].SetValue(0.8f);
+            effect.Parameters["LightColor"].SetValue(new Vector4(0.75f, 0.65f, .6f, 1));
+            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(.8f, .8f, .8f, 1f));
+
+            rasterizerState.FillMode = FillMode.Solid;
+            rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.RasterizerState = rasterizerState;
+        }
+
         protected override void Initialize()
         {
             camera = new Camera(GraphicsDevice);
@@ -248,11 +274,11 @@ namespace MatrixProjection
 
         public void CreateCity()
         {
-            for (int x = 0; x < 1; x++)
+            for (int x = 0; x < 3; x++)
             {
                 for (int y = 0; y < 10; y++)
                 {
-                    int size = 30000;
+                    int size = 40000;
                     Cube c = new Cube(new Vector3(x * size, 0, y * size), new Vector3(size, 1, size));
 
                     gameObjects.Add(c);
@@ -266,56 +292,37 @@ namespace MatrixProjection
                     {
                         for (int yy = 0; yy < divisions; yy++)
                         {
-                            if (rnd.Next(0, 10) == 1)
+                            if (rnd.Next(0, 10) <= 3)
                             {
-                                var buildingHeight = rnd.Next(5000, 10000);
+                                var buildingHeight = rnd.Next(10000, 30000);
                                 c = new Cube(new Vector3(x * size + xx * buildingSize, -buildingHeight / 2, y * size + yy * buildingSize), new Vector3(buildingSize, buildingHeight, buildingSize));
                                 //c.Rotation = Matrix.CreateRotationZ(MathHelper.ToRadians(10));
 
                                 gameObjects.Add(c);
 
+                                int chanceOfNewPartition = 90;
+                                var partitionSize = buildingSize;
+                                var partitionHeight = buildingHeight;
+                                while (rnd.Next(0, 100) < chanceOfNewPartition)
+                                {
+                                    partitionSize = Math.Abs(partitionSize - rnd.Next(0, 1000));
+                                    partitionHeight = rnd.Next(100, partitionHeight);
+                                    Cube partition = new Cube(new Vector3(c.pos.X, c.pos.Y - c.size.Y / 2 + 5, c.pos.Z), new Vector3(partitionSize, partitionHeight, partitionSize));
+                                    gameObjects.Add(partition);
+                                    chanceOfNewPartition -= 10;
+                                }
+
                                 foreach (Plane p in c.GetPlanes())
                                 {
                                     Line l = new Line(p.pos, p.pos + p.normal * 500, 10);
 
-                                    gameObjects.Add(p);
+                                    //gameObjects.Add(p);
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-
-        protected override void LoadContent()
-        {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            pixel = Content.Load<Texture2D>("Pixel");
-            gameFont = Content.Load<SpriteFont>("font1");
-            vertexShader = Content.Load<Effect>("vertexShader");
-            pixelShader = Content.Load<Effect>("pixelShader");
-            effect = vertexShader;
-
-            //effect = new BasicEffect(graphics.GraphicsDevice);
-            effect.CurrentTechnique = effect.Techniques["BasicColorDrawing"];
-            //effect.CurrentTechnique = effect.Techniques["DepthMap"];            
-            effect.Parameters["Projection"].SetValue(camera.projectionMatrix);
-            //effect.Parameters["Color"].SetValue(Color.SeaShell.ToVector4());
-            effect.Parameters["LightPos"].SetValue(new Vector3(4000, 4000, -4000));
-            effect.Parameters["LightPower"].SetValue(0.8f);
-            effect.Parameters["LightColor"].SetValue(new Vector4(0.6f, 0.6f, .6f, 1));
-            effect.Parameters["AmbientLightColor"].SetValue(new Vector4(.8f, .8f, .8f, 1f));
-            //effect.AmbientLightColor = new Vector3(.7f, .2f, .4f);
-            //effect.Texture = pixel;
-            //effect.EmissiveColor = new Vector3(1, 0, 0);
-            //effect.TextureEnabled = true;
-            //effect.EnableDefaultLighting();
-
-            rasterizerState.FillMode = FillMode.Solid;
-            rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = rasterizerState;
         }
 
 
@@ -440,13 +447,22 @@ namespace MatrixProjection
                         //gameObjects.Add(cyl);
                         Vector3 oldPlayerPos = player.oldPos;
 
-                        Vector3 newPos = (Vector3)intersection - plane.normal * new Vector3(2, GameConstants.gravity, 2);
+                        Vector3 newPos = (Vector3)intersection - plane.normal * new Vector3(1, GameConstants.gravity, 1);
+
+                        if (Vector2.Distance(new Vector2(newPos.X, newPos.Z), new Vector2(player.pos.X, player.pos.Z)) > player.size.X)
+                        {
+                            // Resolve collision with sphere collider
+                            //newPos += Vector3.Normalize()
+                        }
 
                         
                             player.pos = newPos;
 
-                        player.canJump = true;
-                        player.curJumpFrames = 0;
+                        if (plane.normal.Y > 0)
+                        {
+                            player.canJump = true;
+                            player.curJumpFrames = 0;
+                        }
 
                         //player.pos.Y = intersection.Value.Y;
 
@@ -455,7 +471,7 @@ namespace MatrixProjection
                         var storedVelY = player.vel.Y;
 
                         Vector3 undesiredMotion = plane.normal * (Vector3.Dot(player.vel, plane.normal));
-                        Vector3 desiredMotion = ((player.vel) - (undesiredMotion)) * 0.95f;
+                        Vector3 desiredMotion = ((player.vel) - (undesiredMotion)) * new Vector3(0.95f, 1, 0.95f);
 
 
                         player.vel = desiredMotion;
@@ -464,7 +480,7 @@ namespace MatrixProjection
                         {
                             player.vel.Y = storedVelY;
                         }
-                        player.vel.Y = Math.Min(0, player.vel.Y);
+                        //player.vel.Y = Math.Min(0, player.vel.Y);
 
 
                         collided = true;
@@ -490,7 +506,7 @@ namespace MatrixProjection
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Teal);
+            GraphicsDevice.Clear(Color.DeepSkyBlue);
             //GraphicsDevice.Clear(Color.White);
 
             effect.Parameters["View"].SetValue(camera.viewMatrix);
@@ -504,13 +520,13 @@ namespace MatrixProjection
 
 
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, rasterizerState);
+            /*spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, rasterizerState);
 
             double angle = Math.Atan2((0 - player.pos.Z), (0 - player.pos.X) - Game1.camera.angle.X);
 
             spriteBatch.DrawString(gameFont, (player.vel.Y).ToString(), new Vector2(30, 30), Color.White);
 
-            spriteBatch.End();
+            spriteBatch.End();*/
 
             base.Draw(gameTime);
         }
