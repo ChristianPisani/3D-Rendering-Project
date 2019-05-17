@@ -292,7 +292,7 @@ namespace MatrixProjection
                     {
                         for (int yy = 0; yy < divisions; yy++)
                         {
-                            if (rnd.Next(0, 10) <= 3)
+                            if (rnd.Next(0, 10) <= 2)
                             {
                                 var buildingHeight = rnd.Next(10000, 30000);
                                 c = new Cube(new Vector3(x * size + xx * buildingSize, -buildingHeight / 2, y * size + yy * buildingSize), new Vector3(buildingSize, buildingHeight, buildingSize));
@@ -309,7 +309,7 @@ namespace MatrixProjection
                                     partitionHeight = rnd.Next(100, partitionHeight);
                                     Cube partition = new Cube(new Vector3(c.pos.X, c.pos.Y - c.size.Y / 2 + 5, c.pos.Z), new Vector3(partitionSize, partitionHeight, partitionSize));
                                     gameObjects.Add(partition);
-                                    chanceOfNewPartition -= 10;
+                                    chanceOfNewPartition -= 1;
                                 }
 
                                 foreach (Plane p in c.GetPlanes())
@@ -447,7 +447,7 @@ namespace MatrixProjection
                         //gameObjects.Add(cyl);
                         Vector3 oldPlayerPos = player.oldPos;
 
-                        Vector3 newPos = (Vector3)intersection - plane.normal * new Vector3(1, GameConstants.gravity, 1);
+                        Vector3 newPos = (Vector3)intersection - plane.normal * new Vector3(0.2f, 0.2f, 0.2f);
 
                         if (Vector2.Distance(new Vector2(newPos.X, newPos.Z), new Vector2(player.pos.X, player.pos.Z)) > player.size.X)
                         {
@@ -471,8 +471,11 @@ namespace MatrixProjection
                         var storedVelY = player.vel.Y;
 
                         Vector3 undesiredMotion = plane.normal * (Vector3.Dot(player.vel, plane.normal));
-                        Vector3 desiredMotion = ((player.vel) - (undesiredMotion)) * new Vector3(0.95f, 1, 0.95f);
-
+                        Vector3 desiredMotion = ((player.vel) - (undesiredMotion));
+                        if (plane.normal.Y > 0)
+                        {
+                            desiredMotion *=  new Vector3(0.95f, 1, 0.95f);
+                        }
 
                         player.vel = desiredMotion;
 
@@ -506,7 +509,7 @@ namespace MatrixProjection
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.DeepSkyBlue);
+            GraphicsDevice.Clear(new Color(150, 181, 235));
             //GraphicsDevice.Clear(Color.White);
 
             effect.Parameters["View"].SetValue(camera.viewMatrix);
