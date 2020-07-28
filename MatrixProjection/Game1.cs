@@ -398,8 +398,9 @@ namespace MatrixProjection
 
             foreach (GameObject gameObject in gameObjects)
             {
-                if (gameObject is Cube cube && !(gameObject is Line))
+                if (gameObject is Cube && !(gameObject is Line))
                 {
+                    var cube = gameObject as Cube;
                     //cube.pos.Y = ((float)Math.Sin(angle + cube.pos.X + cube.pos.Z)) * 100;
 
                     float yPos = (Vector2.Distance(mid, new Vector2(gameObject.pos.X, gameObject.pos.Z)));
@@ -408,8 +409,9 @@ namespace MatrixProjection
 
                     cube.Update(gameTime.TotalGameTime.TotalMilliseconds, player.pos);
                 }
-                else if (gameObject is Player p)
+                else if (gameObject is Player)
                 {
+                    var p = gameObject as Player;
                     p.Update(gameTime.TotalGameTime.TotalMilliseconds, cubesInRange);
                 }
                 else

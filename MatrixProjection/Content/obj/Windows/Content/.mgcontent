@@ -4,10 +4,10 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/christian.thorvik/source/repos/MatrixProjection/MatrixProjection/Content/Pixel.png</File>
-    <File>C:/Users/christian.thorvik/source/repos/MatrixProjection/MatrixProjection/Content/font1.spritefont</File>
-    <File>C:/Users/christian.thorvik/source/repos/MatrixProjection/MatrixProjection/Content/PixelShader.fx</File>
-    <File>C:/Users/christian.thorvik/source/repos/MatrixProjection/MatrixProjection/Content/VertexShader.fx</File>
+    <File>D:/Visual Studio Projects/3dRenderingProject/3D-Rendering-Project/MatrixProjection/Content/Pixel.png</File>
+    <File>D:/Visual Studio Projects/3dRenderingProject/3D-Rendering-Project/MatrixProjection/Content/font1.spritefont</File>
+    <File>D:/Visual Studio Projects/3dRenderingProject/3D-Rendering-Project/MatrixProjection/Content/PixelShader.fx</File>
+    <File>D:/Visual Studio Projects/3dRenderingProject/3D-Rendering-Project/MatrixProjection/Content/VertexShader.fx</File>
   </SourceFiles>
   <DestFiles>
     <File xsi:nil="true" />

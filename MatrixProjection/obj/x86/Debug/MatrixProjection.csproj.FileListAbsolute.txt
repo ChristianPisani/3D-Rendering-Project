@@ -25,3 +25,29 @@ C:\Users\christian.thorvik\source\repos\MatrixProjection\MatrixProjection\obj\x8
 C:\Users\christian.thorvik\source\repos\MatrixProjection\MatrixProjection\obj\x86\Debug\MatrixProjection.csproj.CopyComplete
 C:\Users\christian.thorvik\source\repos\MatrixProjection\MatrixProjection\obj\x86\Debug\MatrixProjection.exe
 C:\Users\christian.thorvik\source\repos\MatrixProjection\MatrixProjection\obj\x86\Debug\MatrixProjection.pdb
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\obj\x86\Debug\MatrixProjection.exe
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\obj\x86\Debug\MatrixProjection.pdb
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\obj\x86\Debug\MatrixProjection.csprojResolveAssemblyReference.cache
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\MatrixProjection.exe.config
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\Content\font1.xnb
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\Content\Pixel.xnb
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\Content\PixelShader.xnb
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\Content\VertexShader.xnb
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\MatrixProjection.exe
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\MatrixProjection.pdb
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\MonoGame.Framework.dll
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.MediaFoundation.dll
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.dll
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.XAudio2.dll
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.DXGI.dll
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.Direct3D11.dll
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.Direct2D1.dll
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.XInput.dll
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\MonoGame.Framework.xml
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.MediaFoundation.xml
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.xml
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.XAudio2.xml
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.DXGI.xml
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.Direct3D11.xml
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.Direct2D1.xml
+D:\Visual Studio Projects\3dRenderingProject\3D-Rendering-Project\MatrixProjection\bin\Windows\x86\Debug\SharpDX.XInput.xml

@@ -5,10 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MatrixProjection
-{
-    public class PhysicsObject : GameObject
-    {
+namespace MatrixProjection {
+    public class PhysicsObject : GameObject {
         public Vector3 oldPos;
         public Vector3 vel, prevVel;
         public Vector3 acl, prevAcl;
@@ -21,8 +19,8 @@ namespace MatrixProjection
 
         Line velLine;
 
-        public PhysicsObject(Vector3 pos, Vector3 size, float mass) : base(pos, size)
-        {
+        public PhysicsObject(Vector3 pos, Vector3 size, float mass)
+            : base(pos, size) {
             this.vel = Vector3.Zero;
             this.acl = Vector3.Zero;
             this.mass = mass;
@@ -33,8 +31,7 @@ namespace MatrixProjection
             collideables = new List<Cube>();
         }
 
-        public void ApplyForce(Vector3 force)
-        {
+        public void ApplyForce(Vector3 force) {
             Vector3 f = force;
             f = Vector3.Divide(f, this.mass);
             float fC = 100;
@@ -42,10 +39,8 @@ namespace MatrixProjection
             this.acl += forceLimited;
         }
 
-        public override void Update(double gameTime)
-        {
-            if (!onGround)
-            {
+        public override void Update(double gameTime) {
+            if (!onGround) {
                 ApplyForce(new Vector3(0, GameConstants.gravity, 0));
             }
 
@@ -59,8 +54,7 @@ namespace MatrixProjection
 
             base.Update(gameTime);
 
-            for (int i = 0; i < timeStep; i++)
-            {
+            for (int i = 0; i < timeStep; i++) {
                 oldPos = new Vector3(pos.X, pos.Y, pos.Z);
 
 
@@ -104,8 +98,9 @@ namespace MatrixProjection
 
                         vel = desiredMotion;
 
-                        if (plane.normal.Y > 0 && this is Player player)
+                        if (plane.normal.Y > 0 && this is Player)
                         {
+                            var player = this as Player;
                             player.canJump = true;
                             player.curJumpFrames = 0;
 
@@ -127,11 +122,9 @@ namespace MatrixProjection
             }
         }
 
-        public void StringForce(Vector3 origin, float length, float elasticity)
-        {
+        public void StringForce(Vector3 origin, float length, float elasticity) {
             float distanceBetween = Vector3.Distance(origin, pos);
-            if (distanceBetween > length)
-            {
+            if (distanceBetween > length) {
                 pos = origin + Vector3.Normalize(pos - origin) * MathHelper.Lerp(distanceBetween, length, elasticity);
 
                 vel = pos - oldPos;

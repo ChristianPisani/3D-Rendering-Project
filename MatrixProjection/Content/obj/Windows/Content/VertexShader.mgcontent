@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/christian.thorvik/source/repos/MatrixProjection/MatrixProjection/Content/VertexShader.fx</SourceFile>
-  <SourceTime>2019-03-14T13:07:43.5034555+01:00</SourceTime>
-  <DestFile>C:/Users/christian.thorvik/source/repos/MatrixProjection/MatrixProjection/Content/bin/Windows/Content/VertexShader.xnb</DestFile>
-  <DestTime>2020-02-20T15:39:10.1370313+01:00</DestTime>
+  <SourceFile>D:/Visual Studio Projects/3dRenderingProject/3D-Rendering-Project/MatrixProjection/Content/VertexShader.fx</SourceFile>
+  <SourceTime>2020-07-28T10:25:37.4060265+02:00</SourceTime>
+  <DestFile>D:/Visual Studio Projects/3dRenderingProject/3D-Rendering-Project/MatrixProjection/Content/bin/Windows/Content/VertexShader.xnb</DestFile>
+  <DestTime>2020-07-28T10:26:41.325765+02:00</DestTime>
   <Importer>EffectImporter</Importer>
   <ImporterTime>2018-12-08T17:35:54+01:00</ImporterTime>
   <Processor>EffectProcessor</Processor>
